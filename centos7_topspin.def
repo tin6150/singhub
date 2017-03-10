@@ -1,0 +1,52 @@
+# Adopted from https://github.com/singularityware/singularity/blob/master/examples/centos.def
+# def for container intended to hold NMR sw topspin 
+# this container can be bootstrapped from centos6
+# build into a centos7 container, and utilize all the necessary rhel7-level rpm from yum.
+# resulting topspin sw in this container works well in a centos 6 workstation
+# 
+# ftp://ftp.bruker.de/pub/nmr/CentOS/7/TopSpinInstallationRequirements.html
+#
+# this image need to be at least 3000 MB, best around 4000 MB to include all the fonts
+
+BootStrap: yum
+OSVersion: 7
+
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
+Include: yum
+
+%runscript
+    /opt/run_topspin.sh 
+
+%post
+    yum -y install bash
+    yum -y install environment-modules
+    # source /etc/profile.d/modules.sh # to get the "module command" to work
+    yum -y install which
+    yum -y install less
+    yum -y install wget
+    yum -y install coreutils
+    yum -y install bzip2
+    yum -y install tar
+    yum -y install gzip
+    yum -y install vi
+    yum -y install util-linux-ng 
+    yum -y install openssh-clients
+    yum -y install xterm
+    yum -y install tigervnc-server
+    yum -y install tigervnc
+
+    yum -y --nogpgcheck install ftp://ftp.bruker.de/pub/nmr/CentOS/7/Bruker-Addon/bruker-addon-latest.x86_64.rpm
+    yum -y install epel-release
+    yum -y install --enablerepo=bruker   bruker-topspin-environ
+
+    mkdir /nonexistent
+    mkdir -p /export/home
+    groupadd -g 18114 sbio
+    groupadd -g 16031 nmrsu
+    useradd -d /export/home/nmrsu -m  -c "nmr super user"     -s /bin/bash -p *place*your*shadow*entry*here*  -g 18114 -u 16031 nmrsu
+    useradd -d /export/home/nmr   -m  -c "nmr user"           -s /bin/bash -p *place*your*shadow*entry*here*  -g 18114 -u 10001 nmr
+    useradd -d /nonexistent       -m  -c "FLEXlm License Mgr" -s /bin/bash -p '*LK*no*login*'               -U         -u 10002 flexlm
+
+    # tba, add additional fonts to make program menu text better.
+    # next step is to run the topspin interactive install as root inside the container
+    # not included cuz it is commercial sw req license.
