@@ -1,0 +1,35 @@
+
+
+### AVOID using this definition file for creating singularity container
+### setting --releasever=6 in yum 
+### will allow a centos7 machine to bootstrap a centos6 image
+### however, there will be two yum database inside the image, thus not recommended 
+### The singularity mailling list has further discussion on this topic
+
+
+BootStrap: yum
+#OSVersion: 7
+OSVersion: 6
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
+Include: yum
+
+# If you want the updates (available at the bootstrap date) to be installed
+# inside the container during the bootstrap instead of the General Availability
+# point release (7.x) then uncomment the following line
+#UpdateURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/updates/$basearch/
+
+
+%runscript
+    echo "This is what happens when you run the container..."
+
+
+
+
+# will test with --releasever=6 to see what results in /var/lib/rpm
+%post
+    echo "Hello from inside the container"
+    yum -y --releasever=6 install vim-minimal
+    yum -y --releasever=6 install coreutils
+    yum -y --releasever=6 install bzip2
+
+
