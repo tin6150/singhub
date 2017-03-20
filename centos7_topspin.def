@@ -43,10 +43,15 @@ Include: yum
     mkdir -p /export/home
     groupadd -g 18114 sbio
     groupadd -g 16031 nmrsu
-    useradd -d /export/home/nmrsu -m  -c "nmr super user"     -s /bin/bash -p *place*your*shadow*entry*here*  -g 18114 -u 16031 nmrsu
-    useradd -d /export/home/nmr   -m  -c "nmr user"           -s /bin/bash -p *place*your*shadow*entry*here*  -g 18114 -u 10001 nmr
-    useradd -d /nonexistent       -m  -c "FLEXlm License Mgr" -s /bin/bash -p '*LK*no*login*'               -U         -u 10002 flexlm
+    useradd -d /export/home/nmrsu -m  -c "nmr super user"     -s /bin/bash -p '*place*your*shadow*entry*here*' -g 18114 -u 16031 nmrsu
+    useradd -d /export/home/nmr   -m  -c "nmr user"           -s /bin/bash -p '*place*your*shadow*entry*here*' -g 18114 -u 10001 nmr
+    useradd -d /nonexistent       -m  -c "FLEXlm License Mgr" -s /bin/bash -p '*LK*no*login*'                -U         -u 10002 flexlm
 
-    # tba, add additional fonts to make program menu text better.
+    # install additional fonts, without them topspin menu looks kinda ugly
+    # done as add-on script as other container to host GUI program may use it as well
+    wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/fonts_addition.sh
+    bash fonts_addition.sh
+
     # next step is to run the topspin interactive install as root inside the container
-    # not included cuz it is commercial sw req license.
+    # not included cuz it is commercial sw req license, and it is interactive GUI install.
+

@@ -12,6 +12,8 @@
 # - curl
 # cpanminus and many perl modules will be installed by this script
 
+# wget https://raw.githubusercontent.com/tin6150/singhub/master/circos_perl_mod.sh
+
 SRC_DIR=/tmp/src
 test -d $SRC_DIR || mkdir -p $SRC_DIR
 cd $SRC_DIR

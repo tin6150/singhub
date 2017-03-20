@@ -61,79 +61,17 @@ Include: yum
     #echo '*** mount ***'       >> /etc/singularity/singularity_bootstart.log
     #mount                      >> /etc/singularity/singularity_bootstart.log
 
-    #cpan -i Carp                       # cpan first run ask lots of config questions :(
-    #perl -MCPAN -e 'install Carp'
-    #perl -MCPAN -e 'install Data::Dumper'
+    # use add-on script to install necessary CPAN modules
+    # This is mostly so that this .def file fit within the singularity (2.2) length limit
+    wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/circos_perl_mod.sh
+    bash circos_perl_mod.sh
 
-    SRC_DIR=/opt/src
+
     CIRCOS_DIR=/opt/circos
     CIRCOS_VER=0.69-3
     CIRCOS_TOOLS_VER=0.22
     CIRCOS_TUTORIAL_VER=0.67
-
     
-    #test -d $SRC_DIR || mkdir -p $SRC_DIR
-    #cd $SRC_DIR
-    curl -L http://cpanmin.us | perl - App::cpanminus
-    CPANM=/usr/local/bin/cpanm
-
-    $CPANM Compress::Zlib       # not explicitly stated but needed
-    $CPANM Test::Warnings       # not absolute, but reduces warnings in XSLoader test
-    $CPANM Test::Fatal
-    $CPANM Carp
-    $CPANM Clone
-    $CPANM Config::General
-    $CPANM Cwd
-    $CPANM "Data::Dumper"
-    $CPANM Digest::MD5
-    $CPANM File::Basename
-    $CPANM File::Spec::Functions
-    $CPANM File::Temp
-    $CPANM FindBin
-    $CPANM Font::TTF::Font
-
-
-
-    $CPANM List::Util
-    $CPANM Math::Round
-    $CPANM Math::Trig
-    $CPANM "Math::VecStat"
-
-    $CPANM Memoize
-    $CPANM Params::Validate
-    $CPANM Pod::Usage
-
-    $CPANM POSIX
-    $CPANM Readonly
-    $CPANM Regexp::Common
-    $CPANM Statistics::Basic
-    $CPANM Sys::Hostname
-    $CPANM Text::Balanced
-    $CPANM Text::Format
-    $CPANM Time::HiRes
-
-    $CPANM Math::Bezier
-    $CPANM Set::IntSpan
-    $CPANM SVG
-
-    $CPANM Getopt::Long
-    $CPANM IO::File
-    $CPANM --notest Storable
-    $CPANM --notest List::MoreUtils     # picky about XSLoader version 
-
-    #$CPANM GD
-    $CPANM GD::Image
-
-    echo "hello world.  testing 0"                  >> /etc/singularity/singularity_bootstart.log
-    echo "hello world.  testing 1"                  >> /etc/singularity/singularity_bootstart.log
-    echo "hello world.  testing 2"                  >> /etc/singularity/singularity_bootstart.log
-    # stops around here.
-    echo "hello world.  testing 3"                  >> /etc/singularity/singularity_bootstart.log
-    echo "hello world.  testing 4"                  >> /etc/singularity/singularity_bootstart.log
-    echo "hello world.  testing 5"                  >> /etc/singularity/singularity_bootstart.log
-    echo "hello world.  testing 6"                  >> /etc/singularity/singularity_bootstart.log
-
-
     CIRCOS_SOURCE_FILE=circos-${CIRCOS_VER}.tgz
     CIRCOS_TOOLS_SOURCE_FILE=circos-tools-${CIRCOS_TOOLS_VER}.tgz
     CIRCOS_TUTORIAL_SOURCE_FILE=circos-tutorials-${CIRCOS_TUTORIAL_VER}.tgz
