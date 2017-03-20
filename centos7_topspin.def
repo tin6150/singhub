@@ -1,5 +1,8 @@
 # Singularity definition file for a Bruker Topspin NMR app container
 # running on CentOS 7
+#
+# For example command to start topspin with this container, see
+# https://github.com/tin6150/singhub/start_topspin_from_container.sh
 # 
 # Adopted from https://github.com/singularityware/singularity/blob/master/examples/centos.def
 # def for container intended to hold NMR sw topspin 
@@ -58,3 +61,17 @@ Include: yum
     # next step is to run the topspin interactive install as root inside the container
     # not included cuz it is commercial sw req license, and it is interactive GUI install.
 
+    echo " \
+    To run topspin, execute the following from the host: \
+        export LD_LIBRARY_PATH=/prog/structchem/topspin_singularity/2.2.1/lib/:$LD_LIBRARY_PATH \
+\
+        /usr/local/bin/singularity exec -B \
+          /prog/structchem/topspin_singularity/user:/opt/topspin3.5.b.85pl7/prog/curdir,\
+          /prog/structchem/topspin_singularity/logfiles:/opt/topspin3.5.b.85pl7/prog/logfiles,\
+          /prog/structchem/topspin_singularity/au_script:/opt/topspin3.5.b.85pl7/exp/stan/nmr/au/src/user,\
+          /prog/structchem/topspin_singularity/py_script:/opt/topspin3.5.b.85pl7/exp/stan/nmr/py/user,\
+          /prog/structchem/topspin_singularity/conf_global:/opt/topspin3.5.b.85pl7/conf/global,\
+          /prog/structchem/topspin_singularity/nonexistent:/nonexistent,\
+        topspin3.img   /opt/topspin3.5.b.85pl7/topspin \
+     " > /opt/run_topspin.sh
+    chmod a+x /opt/run_topspin.sh
