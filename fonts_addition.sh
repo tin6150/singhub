@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ### add fonts to improve visual appearance of topspin nmr GUI app
+### Take up ~ 3GB of space (107 fonts)
 
 ### fonts found on centos6 machine
 ### installed into centos7 container
@@ -118,4 +119,3 @@ yum install -y xorg-x11-fonts-ISO8859-9-100dpi
 yum install -y xorg-x11-fonts-ISO8859-9-75dpi
 yum install -y xorg-x11-fonts-misc
 yum install -y xorg-x11-fonts-Type1
-yum install -y zhongyi-song-fonts

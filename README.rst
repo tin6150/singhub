@@ -41,5 +41,5 @@ sudo    /e/bin/singularity create --size 3200 topspin.img
 sudo -E /e/bin/singularity bootstrap topspin.img centos7_topspin.def 
 
 
-sudo    /e/bin/singularity create --size 2200 circos.img
+sudo    /e/bin/singularity create --size 1300 circos.img
 sudo -E /e/bin/singularity --debug bootstrap circos.img centos6_circos.def 

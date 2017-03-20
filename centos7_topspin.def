@@ -1,3 +1,6 @@
+# Singularity definition file for a Bruker Topspin NMR app container
+# running on CentOS 7
+# 
 # Adopted from https://github.com/singularityware/singularity/blob/master/examples/centos.def
 # def for container intended to hold NMR sw topspin 
 # this container can be bootstrapped from centos6
@@ -6,7 +9,9 @@
 # 
 # ftp://ftp.bruker.de/pub/nmr/CentOS/7/TopSpinInstallationRequirements.html
 #
-# this image need to be at least 3000 MB, best around 4000 MB to include all the fonts
+# this .def file result in 1.3 GB image
+# topspin sw install will subsequently takes a lot of space.
+# need to create this image with 3000 MB, best around 4000 MB to include all the fonts
 
 BootStrap: yum
 OSVersion: 7

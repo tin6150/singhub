@@ -52,7 +52,6 @@ $CPANM Statistics::Basic
 $CPANM Sys::Hostname
 $CPANM Text::Balanced
 $CPANM Text::Format
-$CPANM Time::HiRes
 
 $CPANM Math::Bezier
 $CPANM Set::IntSpan
@@ -65,4 +64,10 @@ $CPANM --notest List::MoreUtils     # picky about XSLoader version
 
 #$CPANM GD
 $CPANM GD::Image
+
+$CPANM --force Time::HiRes
+## Time::HiRes has some complain:
+## df: Warning: cannot read table of mounted file systems: No such file or directory
+## Unknown fstype for Time-HiRes-utime-_w5ptKunu
+## and fail some 6/18 test, but they seems to be rounding errors, so likely safe to ignore and use --force
 
