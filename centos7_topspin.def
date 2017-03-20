@@ -29,11 +29,9 @@ Include: yum
     yum -y install tar
     yum -y install gzip
     yum -y install vi
-    yum -y install util-linux-ng 
-    yum -y install openssh-clients
+    yum -y install util-linux-ng        # u/mount, etc
+    yum -y install openssh-clients      # to get scp
     yum -y install xterm
-    yum -y install tigervnc-server
-    yum -y install tigervnc
 
     yum -y --nogpgcheck install ftp://ftp.bruker.de/pub/nmr/CentOS/7/Bruker-Addon/bruker-addon-latest.x86_64.rpm
     yum -y install epel-release

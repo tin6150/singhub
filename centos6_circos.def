@@ -35,18 +35,19 @@ Include: yum
     yum -y install bash
     yum -y install wget
     yum -y install curl
-    yum -y install tar          # circos extract
-    yum -y install coreutils    # for convinience, provide yes
-    yum -y install which        # for debugging use only, not req
+    yum -y install tar              # circos extract
+    yum -y install coreutils        # for convinience, provide yes
+    yum -y install which            # for debugging use only, not req
+    yum -y install util-linux-ng    # u/mount, etc
 
     # dependencies by circos
-    yum -y install gawk         # circos ./list.modules 
-    yum -y install gcc          # some cpan modules need gcc (eg Clone)
+    yum -y install gawk             # circos ./list.modules 
+    yum -y install gcc              # some cpan modules need gcc (eg Clone)
     yum -y install gd
     yum -y install perl
     yum -y install perl-CPAN
     yum -y install perl-CPANPLUS
-    yum -y install perl-GD     # no TTF support ??
+    yum -y install perl-GD          # no TTF support ??
 
 
 
