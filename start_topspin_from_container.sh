@@ -6,13 +6,16 @@
 # The container itself can be started without (w)rite access, using normal user credentials.
 
 
-export LD_LIBRARY_PATH=/prog/structchem/topspin_singularity/2.2.1/lib/:$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH=/prog/structchem/topspin_singularity/2.2.1/lib/:$LD_LIBRARY_PATH
 
-/usr/local/bin/singularity exec -B \
-  /prog/structchem/topspin_singularity/user:/opt/topspin3.5.b.85pl7/prog/curdir,\
-  /prog/structchem/topspin_singularity/logfiles:/opt/topspin3.5.b.85pl7/prog/logfiles,\
-  /prog/structchem/topspin_singularity/au_script:/opt/topspin3.5.b.85pl7/exp/stan/nmr/au/src/user,\
-  /prog/structchem/topspin_singularity/py_script:/opt/topspin3.5.b.85pl7/exp/stan/nmr/py/user,\
-  /prog/structchem/topspin_singularity/conf_global:/opt/topspin3.5.b.85pl7/conf/global,\
-  /prog/structchem/topspin_singularity/nonexistent:/nonexistent,\
-topspin3.img   /opt/topspin3.5.b.85pl7/topspin
+HOST_BASE_DIR=/prog/structchem/topspin_singularity
+CONTAINER_DIR=/opt/topsping3.5.b.85pl7
+
+singularity exec -B \
+  ${HOST_BASE_DIR}/user:${CONTAINER_DIR}/prog/curdir,\
+  ${HOST_BASE_DIR}/logfiles:${CONTAINER_DIR}/prog/logfiles,\
+  ${HOST_BASE_DIR}/au_script:${CONTAINER_DIR}/exp/stan/nmr/au/src/user,\
+  ${HOST_BASE_DIR}/py_script:${CONTAINER_DIR}/exp/stan/nmr/py/user,\
+  ${HOST_BASE_DIR}/conf_global:${CONTAINER_DIR}/conf/global,\
+  ${HOST_BASE_DIR}/nonexistent:/nonexistent,\
+topspin.img   ${CONTAINER_DIR}/topspin
