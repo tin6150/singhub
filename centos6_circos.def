@@ -5,7 +5,8 @@
 # required approvals from the U.S. Dept. of Energy).  All rights reserved.
 
 
-## this image need to be at least 1250 MB
+## this image need to be at least 1250 MB (no eog)
+## 1400? with eog
 
 BootStrap: yum
 OSVersion: 6
@@ -24,7 +25,7 @@ Include: yum
 
 
 %runscript
-    echo "This is what happens when you run the container..."
+    /opt/circos/circos-0.69-4/bin/circos 
 
 
 %post
@@ -39,6 +40,7 @@ Include: yum
     yum -y install coreutils        # for convinience, provide yes
     yum -y install which            # for debugging use only, not req
     yum -y install util-linux-ng    # u/mount, etc
+    yum -y install eog              # to view .png and .svg produced by circos
 
     # dependencies by circos
     yum -y install gawk             # circos ./list.modules 
@@ -69,25 +71,32 @@ Include: yum
 
 
     CIRCOS_DIR=/opt/circos
-    CIRCOS_VER=0.69-3
+    CIRCOS_VER=0.69-4
     CIRCOS_TOOLS_VER=0.22
     CIRCOS_TUTORIAL_VER=0.67
     
-    CIRCOS_SOURCE_FILE=circos-${CIRCOS_VER}.tgz
-    CIRCOS_TOOLS_SOURCE_FILE=circos-tools-${CIRCOS_TOOLS_VER}.tgz
-    CIRCOS_TUTORIAL_SOURCE_FILE=circos-tutorials-${CIRCOS_TUTORIAL_VER}.tgz
+    CIRCOS_SOURCE_FILE=circos-${CIRCOS_VER}
+    CIRCOS_TOOLS_SOURCE_FILE=circos-tools-${CIRCOS_TOOLS_VER}
+    CIRCOS_TUTORIAL_SOURCE_FILE=circos-tutorials-${CIRCOS_TUTORIAL_VER}
     test -d $CIRCOS_DIR || mkdir -p $CIRCOS_DIR
     cd $CIRCOS_DIR
-    wget -nc "http://circos.ca/distribution/${CIRCOS_SOURCE_FILE}"
-    wget -nc "http://circos.ca/distribution/${CIRCOS_TOOLS_SOURCE_FILE}"
-    wget -nc "http://circos.ca/distribution/${CIRCOS_TUTORIAL_SOURCE_FILE}"
-    tar xfz $CIRCOS_SOURCE_FILE
-    tar xfz $CIRCOS_TOOLS_SOURCE_FILE
-    tar xfz $CIRCOS_TUTORIAL_SOURCE_FILE
-
+    wget -nc "http://circos.ca/distribution/${CIRCOS_SOURCE_FILE}.tgz"
+    wget -nc "http://circos.ca/distribution/${CIRCOS_TOOLS_SOURCE_FILE}.tgz"
+    wget -nc "http://circos.ca/distribution/${CIRCOS_TUTORIAL_SOURCE_FILE}.tgz"
+    tar xfz ${CIRCOS_SOURCE_FILE}.tgz
+    tar xfz ${CIRCOS_TOOLS_SOURCE_FILE}.tgz
+    tar xfz ${CIRCOS_TUTORIAL_SOURCE_FILE}.tgz
+    echo 'PATH=$PATH:'"/opt/${CIRCOS_SOURCE_FILE};" 'export $PATH' >> /etc/profile
+    echo 'PATH=$PATH:'"/opt/${CIRCOS_SOURCE_FILE};" 'export $PATH' >> /etc/bashrc
+    # open up perms so tutorial work
+    touch       ${CIRCOS_SOURCE_FILE}/example/run.out 
+    chmod 777   ${CIRCOS_SOURCE_FILE}/example/run.out 
+    chmod -R a+w ${CIRCOS_TUTORIAL_SOURCE_FILE}/* 
     # clean up
-    #rm $CIRCOS_SOURCE_FILE
-    #rm $CIRCOS_TOOLS_SOURCE_FILE
+    rm ${CIRCOS_SOURCE_FILE}.tgz
+    rm ${CIRCOS_TOOLS_SOURCE_FILE}.tgz
+    rm ${CIRCOS_TUTORIAL_SOURCE_FILE}.tgz
+
 
     echo "end"                  >> /etc/singularity/singularity_bootstart.log
     date                        >> /etc/singularity/singularity_bootstart.log
