@@ -1,12 +1,9 @@
-# Copyright (c) 2015-2016, Gregory M. Kurtzer. All rights reserved.
-#
-# "Singularity" Copyright (c) 2016, The Regents of the University of California,
-# through Lawrence Berkeley National Laboratory (subject to receipt of any
-# required approvals from the U.S. Dept. of Energy).  All rights reserved.
 
-
-## this image need to be at least 1250 MB (no eog)
-## 1400? with eog
+# Singularity container definition hosting tool from circos.ca in CentOS 6 env
+# Circos installed in /opt, contain examples and tutorials.  
+# xv graphics viewer included to see generated .png, doesn't work for .svg
+# This image need to be at least 1200 MB 
+# adopted from  https://singularity-hub.org/containers/79/
 
 BootStrap: yum
 OSVersion: 6
@@ -40,7 +37,7 @@ Include: yum
     yum -y install coreutils        # for convinience, provide yes
     yum -y install which            # for debugging use only, not req
     yum -y install util-linux-ng    # u/mount, etc
-    yum -y install eog              # to view .png and .svg produced by circos
+    #yum -y install eog              # throws DBus error :(
 
     # dependencies by circos
     yum -y install gawk             # circos ./list.modules 
@@ -96,6 +93,13 @@ Include: yum
     rm ${CIRCOS_SOURCE_FILE}.tgz
     rm ${CIRCOS_TOOLS_SOURCE_FILE}.tgz
     rm ${CIRCOS_TUTORIAL_SOURCE_FILE}.tgz
+
+    # optional XV graphics viewer
+    XV_PKG_FILE=xv-3.10a-37.el6.x86_64.rpm
+    cd /tmp
+    wget ftp://fr2.rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/${XV_PKG_FILE} 
+    rpm -i ${XV_PKG_FILE}
+    rm     ${XV_PKG_FILE}
 
 
     echo "end"                  >> /etc/singularity/singularity_bootstart.log
