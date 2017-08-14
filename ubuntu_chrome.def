@@ -1,0 +1,30 @@
+
+# singularity definition file adopted from http://singularity.lbl.gov
+
+BootStrap: debootstrap
+OSVersion: trusty
+MirrorURL: http://us.archive.ubuntu.com/ubuntu/
+
+
+%runscript
+    /usr/bin/chromium-browser
+    #echo "This is what happens when you run the container..."
+
+
+%post
+    echo "Hello from inside the container"
+    sed -i 's/$/ universe/' /etc/apt/sources.list
+    apt-get -y --force-yes install vim
+    apt-get -y --force-yes install ncurses-term
+    apt-get -y --force-yes install gedit
+    apt-get -y --force-yes install less
+    apt-get -y --force-yes install wget
+    apt-get -y --force-yes install git
+    apt-get -y --force-yes install tar
+    apt-get -y --force-yes install bzip2
+    apt-get -y --force-yes install coreutils
+
+    apt-get -y --force-yes install chromium-browser
+
+    #touch /THIS_IS_INSIDE_SINGULARITY
+
