@@ -6,7 +6,7 @@
 # This singularity container is for POC.  
 # If you use this, please register your at knime.com
 
-# container size need to be 
+# container size is about 1.6 GB
 # Knime workspace will default to $HOME, 
 # so that need to be bind mounted to writable location.
 
