@@ -57,7 +57,7 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     ##[[ -f $KNIME_GZ ]] || curl https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -o $KNIME_GZ 
     # http://subdom.ask-margo.com/cache_tmp/knime_3.4.0.linux.gtk.x86_64.tar.gz
     test -f $KNIME_GZ || wget https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -O $KNIME_GZ 
-    tar -xfz $KNIME_GZ
+    tar -xzf $KNIME_GZ
     ln -s $KNIME_VER knime
 
 
