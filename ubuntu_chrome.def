@@ -1,6 +1,8 @@
 
 # singularity definition file adopted from http://singularity.lbl.gov
 
+## didnt really finish this, as end up using Tru singularity-hub.org setup
+
 BootStrap: debootstrap
 OSVersion: trusty
 MirrorURL: http://us.archive.ubuntu.com/ubuntu/

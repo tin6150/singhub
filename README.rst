@@ -44,3 +44,7 @@ sudo -E /e/bin/singularity bootstrap topspin.img centos7_topspin.def
 sudo    /e/bin/singularity create --size 1700 circos.img
 sudo -E /e/bin/singularity bootstrap circos.img centos6_circos.def | tee sing.log 2>&1
 #sudo -E /e/bin/singularity bootstrap --debug circos.img centos6_circos.def 
+
+singularity=/prog/singularity/2.3/bin/singularity
+sudo    $singularity create --size 2700 knime.img
+sudo -E $singularity bootstrap knime.img ubuntu_knime.def | tee knime.log 2>&1 
