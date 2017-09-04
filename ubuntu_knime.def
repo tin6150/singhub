@@ -6,6 +6,10 @@
 # This singularity container is for POC.  
 # If you use this, please register your at knime.com
 
+# container size need to be 
+# Knime workspace will default to $HOME, 
+# so that need to be bind mounted to writable location.
+
 ## TBA: file rename to knime when posting to singularity-hub
 
 BootStrap: debootstrap
@@ -51,10 +55,10 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     export KNIME_GZ
     ##[[ -f $KNIME_GZ ]] || curl https://drive.google.com/file/d/0B1kImCblq9CeRjFranJnV2lCb00/view?usp=sharing -o $KNIME_GZ 
     ##[[ -f $KNIME_GZ ]] || curl https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -o $KNIME_GZ 
+    # http://subdom.ask-margo.com/cache_tmp/knime_3.4.0.linux.gtk.x86_64.tar.gz
     test -f $KNIME_GZ || wget https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -O $KNIME_GZ 
     tar -xfz $KNIME_GZ
     ln -s $KNIME_VER knime
 
 
-    # http://subdom.ask-margo.com/cache_tmp/knime_3.4.0.linux.gtk.x86_64.tar.gz
 
