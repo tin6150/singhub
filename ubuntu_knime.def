@@ -29,20 +29,9 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 %post
     echo "Hello from inside the container"
     sed -i 's/$/ universe/' /etc/apt/sources.list
-    apt-get -y --force-yes install vim
-    apt-get -y --force-yes install ncurses-term
-    apt-get -y --force-yes install less
-    apt-get -y --force-yes install wget
-    apt-get -y --force-yes install curl
+    apt-get -y --force-yes install vim ncurses-term less wget curl tar bzip2 coreutils python zlib1g-dev zlib1g libgtk-3-0 libgtk2.0-0 # firefox
     #apt-get -y --force-yes install git
-    apt-get -y --force-yes install tar
-    apt-get -y --force-yes install bzip2
-    apt-get -y --force-yes install coreutils
-    apt-get -y --force-yes install python
-    apt-get -y --force-yes install zlib1g-dev zlib1g
-    apt-get -y --force-yes install gedit
-    apt-get -y --force-yes install firefox
-    apt-get -y --force-yes install libgtk-3-0 libgtk2.0-0
+    #apt-get -y --force-yes install gedit			# consistently cause problem :(
 
     touch /THIS_IS_INSIDE_SINGULARITY
 
