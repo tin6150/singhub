@@ -31,9 +31,8 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     apt-get -y --force-yes install bzip2
     apt-get -y --force-yes install coreutils
     apt-get -y --force-yes install python
-    apt-get -y --force-yes install zlib1g-dev
-    apt-get -y --force-yes install zlib1g
-    apt-get -y --force-yes install gtk
+    apt-get -y --force-yes install zlib1g-dev zlib1g
+    apt-get -y --force-yes install libgtk-3-0 libgtk2.0-0
 
     touch /THIS_IS_INSIDE_SINGULARITY
 
