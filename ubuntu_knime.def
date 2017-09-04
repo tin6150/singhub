@@ -14,15 +14,19 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
 
 %runscript
-    echo "Please register at Knime.com when using knime from this Proof of Concept Container"
-
+    echo "To run Knime from a Singularity container.  Will start momentarily..."
+    echo "Please register at Knime.com when using knime from this Proof of Concept Container. " 
+    sleep 1     # sleep 30
+    echo 'singularity run -B /run knime.img'
+    echo ""
+    /opt/knime/knime "$@"
+    
 
 %post
     echo "Hello from inside the container"
     sed -i 's/$/ universe/' /etc/apt/sources.list
     apt-get -y --force-yes install vim
     apt-get -y --force-yes install ncurses-term
-    #apt-get -y --force-yes install gedit
     apt-get -y --force-yes install less
     apt-get -y --force-yes install wget
     apt-get -y --force-yes install curl
@@ -32,6 +36,8 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     apt-get -y --force-yes install coreutils
     apt-get -y --force-yes install python
     apt-get -y --force-yes install zlib1g-dev zlib1g
+    apt-get -y --force-yes install gedit
+    apt-get -y --force-yes install firefox
     apt-get -y --force-yes install libgtk-3-0 libgtk2.0-0
 
     touch /THIS_IS_INSIDE_SINGULARITY
@@ -39,11 +45,16 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     cd /opt
     # download knime from a temporary location.
     # after POC, need to work out with Greg Landrum et co on way to download from knime.com and get user registration and agreement.
-    KNIME_GZ=knime_3.4.0.linux.gtk.x86_64.tar.gz 
+    KNIME_VER=knime_3.4.0
+    export KNIME_VER
+    KNIME_GZ=${KNIME_VER}.linux.gtk.x86_64.tar.gz 
+    export KNIME_GZ
     ##[[ -f $KNIME_GZ ]] || curl https://drive.google.com/file/d/0B1kImCblq9CeRjFranJnV2lCb00/view?usp=sharing -o $KNIME_GZ 
     ##[[ -f $KNIME_GZ ]] || curl https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -o $KNIME_GZ 
-    [[ -f $KNIME_GZ ]] || wget https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -O $KNIME_GZ 
-    tar xfz $KNIME_GZ
+    test -f $KNIME_GZ || wget https://www.dropbox.com/s/lyzmfu3y6q1x06k/knime_3.4.0.linux.gtk.x86_64.tar.gz?dl=0 -O $KNIME_GZ 
+    tar -xfz $KNIME_GZ
+    ln -s $KNIME_VER knime
+
 
     # http://subdom.ask-margo.com/cache_tmp/knime_3.4.0.linux.gtk.x86_64.tar.gz
 
