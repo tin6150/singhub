@@ -18,18 +18,18 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
 
 %runscript
-    echo "To run Knime from a Singularity container.  Will start momentarily..."
-    echo "Please register at Knime.com when using knime from this Proof of Concept Container. " 
+    echo 'To run Knime from a Singularity container.  Will start momentarily...'
+    echo 'Please register at Knime.com when using knime from this Proof of Concept Container. ' 
     sleep 1     # sleep 30
     echo 'singularity run -B /run knime.img'
-    echo ""
+    echo ''
     /opt/knime/knime "$@"
     
 
 %post
     echo "Hello from inside the container"
     sed -i 's/$/ universe/' /etc/apt/sources.list
-    apt-get -y --force-yes install vim ncurses-term less wget curl tar bzip2 coreutils python zlib1g-dev zlib1g libgtk-3-0 libgtk2.0-0 # firefox
+    apt-get -y --force-yes install vim ncurses-term less wget curl tar bzip2 coreutils python zlib1g-dev zlib1g libgtk-3-0 libgtk2.0-0 firefox
     #apt-get -y --force-yes install git
     #apt-get -y --force-yes install gedit			# consistently cause problem :(
 
