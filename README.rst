@@ -57,3 +57,11 @@ sudo /opt/singularity-2.2.1/bin/singularity create  --size 1600 chromium.img
 sudo /opt/singularity-2.2.1/bin/singularity bootstrap           chromium.img ubuntu_chrome.def | tee sing.log 2>&1
 
 
+
+~~~~
+
+Knime, but better off see shub version
+
+singularity=/prog/singularity/2.3/bin/singularity
+sudo    $singularity create --size 2500 knime.img
+sudo -E $singularity bootstrap knime.img ubuntu_knime.def | tee knime.log 2>&1 
