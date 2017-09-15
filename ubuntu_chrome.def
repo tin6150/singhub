@@ -2,12 +2,15 @@
 # singularity definition file adopted from http://singularity.lbl.gov
 
 BootStrap: debootstrap
-OSVersion: trusty
+##OSVersion: trusty  ## 14.04 LTS
+OSVersion: xenial    ## 16.04.3 LTS
+
 MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
 
 %runscript
-    /usr/bin/chromium-browser
+    /usr/bin/google-chrome
+    #/usr/bin/chromium-browser
     #echo "This is what happens when you run the container..."
 
 
@@ -19,12 +22,40 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     apt-get -y --force-yes install gedit
     apt-get -y --force-yes install less
     apt-get -y --force-yes install wget
+    apt-get -y --force-yes install curl
     apt-get -y --force-yes install git
     apt-get -y --force-yes install tar
     apt-get -y --force-yes install bzip2
     apt-get -y --force-yes install coreutils
+    #apt-get -y --force-yes install chromium-browser	# may work in ubuntu 15
 
-    apt-get -y --force-yes install chromium-browser
+
+    # needed by chrome:
+    apt-get -y install -f 
+    apt-get -y --force-yes install gconf-service 
+    apt-get -y --force-yes install libasound2 
+    apt-get -y --force-yes install libgconf-2-4 
+    apt-get -y --force-yes install libnspr4 
+    apt-get -y --force-yes install libxss1 
+    apt-get -y --force-yes install fonts-liberation 
+    apt-get -y --force-yes install libappindicator1 
+	# is this a deb that must be installed: lsb-release 
+    apt-get -y --force-yes install xdg-utils 
+    apt-get -y --force-yes install libnss3 
+    apt-get -y --force-yes install libnspr4 
+
+
+    cd /opt
+    # http://sourcedigit.com/19617-how-to-install-google-chrome-on-ubuntu-16-04/
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+    # apt-get -y --force-yes install google-chrome-stable  # no such package, even when above step succeed.
+
+    # https://askubuntu.com/questions/760085/how-do-you-install-google-chrome-on-ubuntu-16-04
+    #wget -c https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    dpkg -i --force-depends google-chrome-stable_current_amd64.deb
+    apt-get -y install -f 
 
     #touch /THIS_IS_INSIDE_SINGULARITY
 

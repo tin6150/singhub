@@ -44,3 +44,16 @@ sudo -E /e/bin/singularity bootstrap topspin.img centos7_topspin.def
 sudo    /e/bin/singularity create --size 1700 circos.img
 sudo -E /e/bin/singularity bootstrap circos.img centos6_circos.def | tee sing.log 2>&1
 #sudo -E /e/bin/singularity bootstrap --debug circos.img centos6_circos.def 
+
+
+~~~~
+
+Chromium browser using singularity 2.2.1 - cueball
+cd /opt/singularity-2.2.1/img
+
+## 1500 wasn't enough! (though dup download in /opt)  it need stuff like gconf-service
+## expand --size 100 ## will add 100 MB to existing image, it is not spec for final size
+sudo /opt/singularity-2.2.1/bin/singularity create  --size 1600 chromium.img
+sudo /opt/singularity-2.2.1/bin/singularity bootstrap           chromium.img ubuntu_chrome.def | tee sing.log 2>&1
+
+
