@@ -48,3 +48,17 @@ Include: yum
 	find . -name *rpm -exec rpm -i --nodeps {} \;
 	echo 'PATH=$PATH:/opt/dell/srvadmin/bin:/opt/dell/srvadmin/sbin:/opt/dell/toolkit/bin/; export PATH' > /etc/profile.d/dell_env.sh 
 	chmod 664 /etc/profile.d/dell_env.sh
+
+	# find linux/RPMS/ | grep rpm | wc  = 56
+	# find linux/custom/ | grep rpm | wc = 70
+
+
+	# /opt/dell/srvadmin/bin/idracadm  getsysinfo 
+	# /opt/dell/srvadmin/bin/idracadm  set BIOS.ProcSettings.LogicalProc Disabled   seems kinda ok
+	# even when
+	# Singularity> /opt/dell/srvadmin/sbin/racadm  getsysinfo
+	# ERROR: Unable to perform requested operation
+	# racadm.img (no deps, 52 srvadm rpm
+
+	# so, trying with all deps rpm, and 70 rpm listed in linux/custom/
+	# also moving to singhub so that it build overnite.  going to bed soon.
