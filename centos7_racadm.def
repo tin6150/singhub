@@ -1,6 +1,8 @@
 # Singularity definition file to contain Dell RACADM 
 # runs on CentOS 7
 
+# dell_racadm
+
 # Early test
 # main motivation is to run 
 # /opt/dell/srvadmin/sbin/racadm set BIOS.ProcSettings.LogicalProc Disabled
@@ -11,7 +13,7 @@
 #
 # Adopted from https://github.com/singularityware/singularity/blob/master/examples/centos.def
 #
-# this .def file result in x GB image
+# this .def file result in 1.3 GB image
 #
 
 BootStrap: yum
@@ -21,13 +23,27 @@ MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearc
 Include: yum
 
 %runscript
-    /opt/dell/srvadmin/sbin/racadm
+    /opt/dell/srvadmin/sbin/racadm "$@"
 
 %post
-	yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi
-	#yum -y install util-linux-ng        # u/mount, etc
+	##yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi kmod dmidecode libcmpiCppImpl0 openwsman-server sblim-sfcb sblim-sfcc net-snmp-utils  pciutils libxslt openssl setserial libwsman1 openwsman-client
+	yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi kmod dmidecode  libcmpiCppImpl0 
+	# openwsman-server 
+	# sblim-sfcb sblim-sfcc 
+	# net-snmp-utils  pciutils libxslt openssl setserial libwsman1 openwsman-client
+	## some of the deps above broke racadm :(
+	## ERROR: Unable to perform requested operation
+	# util-linux-ng  # provides u/mount, etc
+	# dmidecode is needed by dell racadm, and many more dependencies as listed 
+	# kmod provides lsmod
 	cd /opt
+	mkdir src
+	cd src
     	wget -nc https://downloads.dell.com/FOLDER04162301M/1/OM-SrvAdmin-Dell-Web-LX-8.5.0-2372.RHEL7.x86_64_A00.tar.gz -O racadm.tgz
 	tar xzf racadm.tgz 
-	cd linux/RPMS/supportRPMS/srvadmin/RHEL7/x86_64
-	for F in $( ls -1 *rpm ); do rpm -ivh --nodeps $F; done
+	rm      racadm.tgz
+	#cd linux/RPMS/supportRPMS/srvadmin/RHEL7/x86_64
+	#for F in $( ls -1 *rpm ); do rpm -ivh --nodeps $F; done
+	find . -name *rpm -exec rpm -i --nodeps {} \;
+	echo 'PATH=$PATH:/opt/dell/srvadmin/bin:/opt/dell/srvadmin/sbin:/opt/dell/toolkit/bin/; export PATH' > /etc/profile.d/dell_env.sh 
+	chmod 664 /etc/profile.d/dell_env.sh

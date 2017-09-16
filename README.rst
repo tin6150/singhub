@@ -73,7 +73,8 @@ can't build on lrc-sl7, need root.
 try cueball, but that's ubuntu base...    aptitude install yum.  still problem.  try vagrant vm...
 
 Singularity=/opt/singularity-2.3.1/bin/singularity
-sudo $Singularity create --size 1300 racadm.img
+Singularity=/prog/singularity/2.3/bin/singularity       # c7
+sudo $Singularity create --size 1900 racadm.img
 sudo $Singularity bootstrap racadm.img  centos7_racadm.def | tee racadm.log 2>&1 
 
 
