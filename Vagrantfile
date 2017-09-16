@@ -12,11 +12,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   #config.vm.box = "base"
   #config.vm.box = "base"
-  config.vm.box = "centos/7"
-  #config.vm.define "cen7" do |cen7|
-  #  cen7.vm.box = "centos/7"
-  #end
+  # https://app.vagrantup.com/centos/boxes/7
+  #config.vm.box = "centos/7"
+  config.vm.define "cen7" do |cen7|
+    cen7.vm.box = "centos/7"
+  end
 
+  #config.vm.define "ubu16" do |ubu16|
+  #  ubu16.vm.box = "ubuntu/xenial64"
+  #end
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
