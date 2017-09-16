@@ -27,7 +27,8 @@ Include: yum
 
 %post
 	##yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi kmod dmidecode libcmpiCppImpl0 openwsman-server sblim-sfcb sblim-sfcc net-snmp-utils  pciutils libxslt openssl setserial libwsman1 openwsman-client
-	yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi kmod dmidecode  libcmpiCppImpl0 
+	yum -y install bash tar gzip bzip2 wget curl coreutils util-linux-ng which less vi kmod dmidecode 
+	#  libcmpiCppImpl0 
 	# openwsman-server 
 	# sblim-sfcb sblim-sfcc 
 	# net-snmp-utils  pciutils libxslt openssl setserial libwsman1 openwsman-client
