@@ -13,9 +13,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box = "base"
   #config.vm.box = "base"
   # https://app.vagrantup.com/centos/boxes/7
-  #config.vm.box = "centos/7"
+  #config.vm.box = "foo7"	# mint ran agrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
+  #config.vm.box = "centos/7"	# don't seems to take name of "foobar/7" when doing box add :(
+  #config.vm.box_version = "1708.01"
   config.vm.define "cen7" do |cen7|
-    cen7.vm.box = "centos/7"
+    #cen7.vm.box = "cen7"		# mint, cuz box add centos/7 may not be working right.  still don't work
+    cen7.vm.box = "centos/7"		# mac, where automatic url retrieval works.
   end
 
   #config.vm.define "ubu16" do |ubu16|
