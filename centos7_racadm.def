@@ -60,5 +60,8 @@ Include: yum
 	# ERROR: Unable to perform requested operation
 	# racadm.img (no deps, 52 srvadm rpm
 
+	# [master 876aadf] racadm broken, but idracadm seems to respond predictably.  moving build for singularity hub
+
+
 	# so, trying with all deps rpm, and 70 rpm listed in linux/custom/
 	# also moving to singhub so that it build overnite.  going to bed soon.

@@ -1,5 +1,11 @@
 
-sudo apt-get install vagrant virtualbox
+Mint:    sudo apt-get install vagrant virtualbox
+
+Centos7: yum -y install https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.rpm
+# https://www.tecmint.com/how-to-install-vagrant-on-centos-7/ says vagrant can use docker too...
+# but not so sure.  vagrant ask for VirtualBox, VMware, hyperV.  
+
+# yum -y install virt-what              # inside VM, tell/guess what env is in.
 
 vagrant init 
 vi Vagrantfile
