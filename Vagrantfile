@@ -129,4 +129,41 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
+
+  #### the following was copied fomr the Vagrantfile generated for Mac OS X 
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  config.vm.provider "virtualbox" do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      vb.gui = true
+   
+      # Customize the amount of memory on the VM:
+      # default seems to be 512
+      #vb.memory = "1024"
+      vb.memory = "530"		
+  end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
+
+    ## config added by Tin 2017.0917
+    config.vm.provision "shell", inline: <<-SHELL
+	touch /Vagrant_provision
+	yum -y install vim
+	yum -y install virt-what
+	yum -y group install "Server with GUI"
+	#yum -y group install "KDE"
+    SHELL
+
 end
