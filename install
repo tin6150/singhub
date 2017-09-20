@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# This script install singularity 
+
+# option parsing ref: 
+# https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+
+# default value...
+
+function print_usage () {
+	echo "-h | --help 	this message"
+}
+
+# process command line arguments
+for i in "$@"; do
+	case $i in 
+		-p=*|--prefix=*)
+			PREFIX="${i#*=}"
+			shift # past argument=value
+			;;
+		-h|--help)
+			print_usage
+			shift # past argument with no value
+			;;
+		*)
+			echo "Unknown argument.  Use -h for help"
+			shift
+			;;
+	esac
+done
+
+
+# actual install
+echo "This script install singularity (${VER}) to ${PREFIX}"
+echo "Press ^C in the next 15 seconds to cancel"
+sleep 15
+
+INSTALLDIR=${PREFIX}/singularity/${VER} 
+VER=2.4.alpha
+
+[[ -d ${INSTALLDIR} || mkdir -p ${INSTALLDIR} ]]
+curl http://singularity.gov/singlularity.tgz
+
+
+
+echo "Done"
