@@ -2,45 +2,102 @@
 
 # This script install singularity 
 
+# libtool need to be installed for autogen to work
+
 # option parsing ref: 
 # https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
 
-# default value...
 
 function print_usage () {
-	echo "-h | --help 	this message"
+	echo "This script download singularity, compile and installs it"
+	echo "root prividge is needed as some files need to be installed with suid.  eg:"
+	echo "sudo ./install will install to /usr/local/singularity-\$BUILD"
+	echo "sudo ./install --prefix=/opt --build=2.4.alpha will install to /opt/singularity-2.4.alpha"
 }
 
-# process command line arguments
+### process command line arguments ###
+### sanitize input param?  care about detecting  --b='test;rm' kind of hack??
+### not really important, since user doing it to him/herself at the shell then.
 for i in "$@"; do
 	case $i in 
 		-p=*|--prefix=*)
 			PREFIX="${i#*=}"
 			shift # past argument=value
 			;;
+		-b=*|--build=*)
+			#BUILD="${i#*=}"
+			BUILD="${i#*=}"
+			shift # past argument=value
+			;;
 		-h|--help)
 			print_usage
-			shift # past argument with no value
+			exit 255
 			;;
 		*)
 			echo "Unknown argument.  Use -h for help"
-			shift
+			exit 255
 			;;
 	esac
 done
 
 
-# actual install
-echo "This script install singularity (${VER}) to ${PREFIX}"
+
+
+
+### actual install ###
+
+PREFIX="${PREFIX:-/usr/local}"				# default install to /usr/local unless otherwise specified
+#VER="{VER:-}"
+if [[ x${BUILD} == "x" ]] ; then
+	BUILD=$(date "+%Y.%m%d")
+fi
+INSTALLDIR=${PREFIX}/singularity-${BUILD} 
+
+echo "This script install singularity to ${INSTALLDIR}"
 echo "Press ^C in the next 15 seconds to cancel"
-sleep 15
-
-INSTALLDIR=${PREFIX}/singularity/${VER} 
-VER=2.4.alpha
-
-[[ -d ${INSTALLDIR} || mkdir -p ${INSTALLDIR} ]]
-curl http://singularity.gov/singlularity.tgz
+sleep 1
+#sleep 15
+echo "Press ^C to cancel or the ANY key to continue..."
+read CONFIRM
+echo "installing..."
 
 
 
-echo "Done"
+if [[ ! -d ${INSTALLDIR} ]]; then
+ 	mkdir -p ${INSTALLDIR} 
+	EXITCODE=$?
+	if [[ $EXITCODE -gt 0 ]]; then
+		echo "Unable to create ${INSTALLDIR}.  Exiting."
+		exit $EXITCODE
+	fi
+fi
+
+GITSOURCE=${INSTALLDIR}/github
+if [[ ! -d ${GITSOURCE} ]] ; then
+	# singularity never pulled from github, setting it up now
+	mkdir ${GITSOURCE}
+	cd    ${GITSOURCE}
+	git clone https://github.com/singularityware/singularity.git
+else
+	# update code before install
+	cd    ${GITSOURCE}/singularity
+	git pull
+fi
+
+cd    ${GITSOURCE}/singularity
+./autogen.sh
+EXITCODE=$?
+if [[ $EXITCODE -gt 0 ]]; then
+	echo "autogen didn't work correctly.  "
+	echo "Please make sure the following packages are installed: libtool automake autoconf"
+	exit $EXITCODE
+fi
+./configure --prefix=${INSTALLDIR}
+make
+sudo make install
+EXITCODE=$?
+if [[ $EXITCODE -eq 0 ]]; then
+	echo "Done.  Singularity installed to ${INSTALLDIR}."
+else
+	echo "Something didn't go right, Singularity install exits with ${EXITCODE}."
+fi
