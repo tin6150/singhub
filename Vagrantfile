@@ -19,6 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "cen7" do |cen7|
     #cen7.vm.box = "cen7"		# mint, cuz box add centos/7 may not be working right.  still don't work
     cen7.vm.box = "centos/7"		# mac, where automatic url retrieval works.
+    cen7.vm.network :forwarded_port, guest: 5901, host: 5901	# vncserver :1 # hopefully cli works
   end
 
   #config.vm.define "ubu16" do |ubu16|
