@@ -10,7 +10,8 @@
 
 function print_usage () {
 	echo "This script download singularity, compile and installs it"
-	echo "root prividge is needed as some files need to be installed with suid.  eg:"
+	echo "root prividge is needed as some files need to be installed to libexec dir with suid."
+	echo "Example usage:"
 	echo "sudo ./install will install to /usr/local/singularity-\$BUILD"
 	echo "sudo ./install --prefix=/opt --build=2.4.alpha will install to /opt/singularity-2.4.alpha"
 }
