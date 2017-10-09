@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# This script install singularity 
+# This script install singularity.  eg run as:
+# sudo ./install --prefix=/opt --build=2.4.beta
 
 # libtool need to be installed for autogen to work
 
