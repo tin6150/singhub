@@ -143,7 +143,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
-      vb.memory = "530"		
+      vb.memory = "1530"		
   end
   #
   # View the documentation for the provider you are using for more
@@ -160,10 +160,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ## config added by Tin 2017.0917
     config.vm.provision "shell", inline: <<-SHELL
 	touch /Vagrant_provision
-	yum -y install vim
+	yum -y install vim wget curl git autoconf automake libtool
 	yum -y install virt-what
 	yum -y group install "Server with GUI"
 	#yum -y group install "KDE"
+	[[ -d /opt ]] || mkdir /opt
+	cd /opt
+	wget https://raw.githubusercontent.com/tin6150/singhub/master/install 
+	bash install --prefix=/opt --build=2.4.beta
     SHELL
 
 end
