@@ -19,6 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "cen7" do |cen7|
     #cen7.vm.box = "cen7"		# mint, cuz box add centos/7 may not be working right.  still don't work
     cen7.vm.box = "centos/7"		# mac, where automatic url retrieval works.
+    cen7.vm.network :forwarded_port, guest: 5901, host: 5901	# vncserver :1 # hopefully cli works
   end
 
   #config.vm.define "ubu16" do |ubu16|
@@ -143,7 +144,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
-      vb.memory = "530"		
+      vb.memory = "1530"		
   end
   #
   # View the documentation for the provider you are using for more
@@ -160,10 +161,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ## config added by Tin 2017.0917
     config.vm.provision "shell", inline: <<-SHELL
 	touch /Vagrant_provision
-	yum -y install vim
+	yum -y install vim wget curl git autoconf automake libtool tigervnc-server
 	yum -y install virt-what
 	yum -y group install "Server with GUI"
 	#yum -y group install "KDE"
+	[[ -d /opt ]] || mkdir /opt
+	cd /opt
+	wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
+	bash install --prefix=/opt --build=2.4.beta
+	KNIMEIMG=tin6150-knime-withFullExtension.img
+	[[ -f $KNIMEIMG ]] || /opt/singularity-2.4.beta/bin/singularity pull shub://tin6150/knime:withFullExtension
+	# seems to have java by default...
+	wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
+	mv 10-monitor.conf /etc/X11/xorg.conf.d/
+	# pff... can't get the resolution to work on virtualbox on macbook.
+	# just use vncserver -geometry 1280x800 
+	
+	cd $HOME
+	wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc
+	mkdir /home/sn-gh 
+	cd    /home/sn-gh
+	git clone https://tin6150@github.com/tin6150/psg
+	git clone https://tin6150@github.com/tin6150/singhub
+
     SHELL
 
 end

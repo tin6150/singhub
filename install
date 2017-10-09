@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# This script install singularity 
+# This script install singularity.  eg run as:
+# sudo ./install --prefix=/opt --build=2.4.beta
 
 # libtool need to be installed for autogen to work
 
@@ -90,7 +91,7 @@ cd    ${GITSOURCE}/singularity
 EXITCODE=$?
 if [[ $EXITCODE -gt 0 ]]; then
 	echo "autogen didn't work correctly.  "
-	echo "Please make sure the following packages are installed: libtool automake autoconf"
+	echo "Please make sure the following packages are installed: autoconf automake libtool"
 	exit $EXITCODE
 fi
 ./configure --prefix=${INSTALLDIR}
