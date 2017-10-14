@@ -1,0 +1,15 @@
+---
+
+#
+# example ansible playbook file that expect vagrant provision to run
+#
+# yaml quirky: 
+# --- means start of doc
+# ... means end of doc
+#
+
+- name: get latest zsh 
+  yum:
+    name: zsh
+    state: latest
+
