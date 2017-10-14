@@ -167,13 +167,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	#yum -y group install "KDE"
 
 	### singulairty and example knime container
-	[[ -d /opt ]] || mkdir /opt
-	cd /opt
-	wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
-	bash install --prefix=/opt --build=2.4
-	KNIMEIMG=tin6150-knime-withFullExtension.img
-	##[[ -f $KNIMEIMG ]] || /opt/singularity-2.4/bin/singularity pull shub://tin6150/knime:withFullExtension
-	# seems to have java by default, so no need to install that
+	BUILD_SINGULARITY=0	# 0 = omit, don't build.  1 = build it
+	if [[ x$BUILD_SINGULARITY == x1 ]] ; then
+		[[ -d /opt ]] || mkdir /opt
+		cd /opt
+		wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
+		bash install --prefix=/opt --build=2.4
+	fi
+	GET_KNIME=0
+	if [[ x$GET_KNIME == x1 ]] ; then
+		KNIMEIMG=tin6150-knime-withFullExtension.img
+		##[[ -f $KNIMEIMG ]] || /opt/singularity-2.4/bin/singularity pull shub://tin6150/knime:withFullExtension
+		# seems to have java by default, so no need to install that
+	fi
 
 	### X11 stuff
 	wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
@@ -184,10 +190,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	### my favorite config and stuff
 	cd $HOME
 	wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc
-	mkdir /home/sn-gh 
-	cd    /home/sn-gh
-	git clone https://tin6150@github.com/tin6150/psg
-	git clone https://tin6150@github.com/tin6150/singhub
+	if [[ ! -d tin-gh ]] ; then
+		mkdir tin-gh 
+		cd    tin-gh
+		git clone https://tin6150@github.com/tin6150/psg
+		git clone https://tin6150@github.com/tin6150/singhub
+	fi
 
     SHELL
 
@@ -197,7 +205,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # can i have both shell provision and ansible??  
     #
     config.vm.provision "ansible" do |ansible|
-      ansible.playbook = "vagrantfile_play.yml"
+      ansible.verbose = "v"
+      #ansible.become = "true"
+      #ansible.become_user = "root"
+      ansible.playbook = "vagrantfile_playbook.yml"
     end
 
 end

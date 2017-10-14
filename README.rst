@@ -80,3 +80,13 @@ sudo $Singularity bootstrap racadm.img  centos7_racadm.def | tee racadm.log 2>&1
 
 
 
+--------------------------
+tmp misc
+--------------------------
+
+for hysterical reason, vagrant and/or some ansible stuff is in this dir
+(cuz was trying to make VM using vagrant to build and test singularity container while on a mac)
+
+these files may move in the future...
+or more elaborate version build elsewhere and this dir remains a playground
+
