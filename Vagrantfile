@@ -144,7 +144,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
-      vb.memory = "1530"		
+      vb.memory = "2330"		
   end
   #
   # View the documentation for the provider you are using for more
@@ -163,20 +163,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	touch /Vagrant_provision
 	yum -y install vim wget curl git autoconf automake libtool tigervnc-server
 	yum -y install virt-what
-	yum -y group install "Server with GUI"
+	#yum -y group install "Server with GUI"
 	#yum -y group install "KDE"
+
+	### singulairty and example knime container
 	[[ -d /opt ]] || mkdir /opt
 	cd /opt
 	wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
-	bash install --prefix=/opt --build=2.4.beta
+	bash install --prefix=/opt --build=2.4
 	KNIMEIMG=tin6150-knime-withFullExtension.img
-	[[ -f $KNIMEIMG ]] || /opt/singularity-2.4.beta/bin/singularity pull shub://tin6150/knime:withFullExtension
-	# seems to have java by default...
+	##[[ -f $KNIMEIMG ]] || /opt/singularity-2.4/bin/singularity pull shub://tin6150/knime:withFullExtension
+	# seems to have java by default, so no need to install that
+
+	### X11 stuff
 	wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
 	mv 10-monitor.conf /etc/X11/xorg.conf.d/
 	# pff... can't get the resolution to work on virtualbox on macbook.
 	# just use vncserver -geometry 1280x800 
 	
+	### my favorite config and stuff
 	cd $HOME
 	wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc
 	mkdir /home/sn-gh 
@@ -185,5 +190,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	git clone https://tin6150@github.com/tin6150/singhub
 
     SHELL
+
+    #
+    # Run Ansible from the Vagrant Host
+    # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
+    # can i have both shell provision and ansible??  
+    #
+    config.vm.provision "ansible" do |ansible|
+      ansible.playbook = "vagrantfile_play.yml"
+    end
 
 end
