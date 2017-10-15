@@ -26,7 +26,7 @@
         yum: 
           name: zsh 
           state: latest
-      when: ansible_os_family == "RedHat" # could not define this for "all task" level.  
+      when: ansible_os_family == "RedHat" # use blok to define this for "all task" level.   
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
