@@ -11,22 +11,28 @@
 # like python, space matter!  it dictates the hierarchy
 #    but the "-" to define list has to stick out for visibility.  this make shifting block level a real PITA  !!!! :( 
 
+#- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
   tasks:
     - name: ensure ntpd is at the latest version
+      when: ansible_os_family == "RedHat" # could not define this for "all task" level.  
       yum: pkg=ntp state=latest
       notify:
         - restart ntpd
-    - name: get latest zsh 
-      yum: pkg=zsh state=latest
-#    if not http service installed, the following generate error 
-#    - name: stop httpd 
-#      service:
-#        name:  http
-#        state: stopped
+    - name: latest zsh is present # alt syntax, but i like it less, too name "name" clause
+      yum: 
+        name: zsh 
+        state: latest
+      when: ansible_os_family == "RedHat"
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
-
+    # service should be in handler, then even if don't exist, no complain
+    # well, nothing will call this block, so maybe why no complains
+    - name: stop httpd 
+      service:
+        name:  http
+        state: stopped
+ 
 
