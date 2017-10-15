@@ -17,6 +17,7 @@
 - hosts: all
   become: true  # sudo, default to root
   tasks:
+
     - block:
       - name: ensure ntpd is at the latest version
         yum: pkg=ntp state=latest
@@ -26,7 +27,37 @@
         yum: 
           name: zsh 
           state: latest
+      - name: Install EPEL repo.
+        yum:
+          name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+          state: latest #present
+          # state absent does not ensure it is removed.  
+          # present does not revert changes made to file.  think of yum running not ovewriting existing config.
+      - name: Import EPEL GPG key.
+        rpm_key:
+          key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+          state: present
+        # lxde is not in epel either.  maybe use xfce, which use GDM.  MATE use LightDM and don't want to mess with that.
+        # https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/RedHat.yml
+      - name: latest lxde is present
+        yum: pkg=lxde state=removed #absent #latest
+      - name: xfce is present
+        #shell: yum --enablerepo=epel -y groupinstall xfce-desktop x11
+        yum: enablerepo=epel name="@Xfce" state=present
+        # @package-group-name vs @^environment-group-name, see "yum grouplist" and 
+        # http://docs.ansible.com/ansible/latest/yum_module.html 
+        #when: redhat_desktop == 'xfce'
+      - name: Install RedHat X11
+        yum: name="@x11" state=present
+        ## okay, Xfce and X11 installed, but don't work in virtualbox.  video driver problem
       when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !! WHY?!
+
+    - block:
+        - name: latest csh is present # trying to exlude this in RedHat.  works.  see result as skip, condition was False.
+          apt: pkg=csh state=latest
+      when: ansible_os_family == "Debian"  
+      # INCLUDE eg, see https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/main.yml 
+
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
