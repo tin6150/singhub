@@ -12,7 +12,7 @@
 #    but the "-" to define list has to stick out for visibility.  this make shifting block level a real PITA  !!!! :( 
 
 - hosts: all
-  sudo: true
+  become: true  # sudo, default to root
   tasks:
     - name: ensure ntpd is at the latest version
       yum: pkg=ntp state=latest
@@ -20,11 +20,12 @@
         - restart ntpd
     - name: get latest zsh 
       yum: pkg=zsh state=latest
+    - name: stop httpd
+      service:
+      name: stop httpd
+      state: stopped
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
-    - name: stop httpd
-      service:
-      name: httpd
-      state: stopped
+
 
