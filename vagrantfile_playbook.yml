@@ -20,10 +20,11 @@
         - restart ntpd
     - name: get latest zsh 
       yum: pkg=zsh state=latest
-    - name: stop httpd
-      service:
-      name: stop httpd # complain about this
-      state: stopped
+#    if not http service installed, the following generate error 
+#    - name: stop httpd 
+#      service:
+#        name:  http
+#        state: stopped
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
