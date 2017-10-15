@@ -22,7 +22,7 @@
       yum: pkg=zsh state=latest
     - name: stop httpd
       service:
-      name: stop httpd
+      name: stop httpd # complain about this
       state: stopped
   handlers:
     - name: restart ntpd
