@@ -16,8 +16,11 @@
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
+  roles:
+    - role: PeterMosmans.virtualbox-guest
+      # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
+      # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
   tasks:
-
     - block:
       - name: ensure ntpd is at the latest version
         yum: pkg=ntp state=latest
