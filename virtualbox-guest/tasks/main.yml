@@ -130,11 +130,12 @@
       state=present
     when: kernel is defined and kernel.stdout is defined and ansible_os_family == 'Debian'
 
-  - name: Install kernel headers for CentOSes
+  - name: Install latest kernel and headers for CentOSes
     package:
       name: "{{ item }}"
-      state: present
+      state: latest # needed latest for dmks to find matching header 
     with_items:
+      - kernel
       - kernel-headers-{{ kernel.stdout }}
       - kernel-devel
     when: kernel is defined and ansible_os_family == 'RedHat' and kernel.stdout is defined 
