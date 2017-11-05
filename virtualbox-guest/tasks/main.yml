@@ -165,7 +165,7 @@
 
     ## centos needed KERN_DIR set to find kernel lib... if Debian has it in same dir then can merge both build clause
   - name: Build and install VBoxGuestAdditions from file for CentOSes
-    shell: /bin/bash KERN_DIR=/usr/src/kernels/{{kernel.stdout }} /media/cdrom/VBoxLinuxAdditions.run --nox11
+    shell: /bin/bash KERN_DIR=/usr/src/kernels/{{ kernel.stdout }} /media/cdrom/VBoxLinuxAdditions.run --nox11
     when: ( virtualbox_x11 is undefined or not virtualbox_x11 ) and ansible_os_family == 'RedHat' 
     ignore_errors: yes
 
