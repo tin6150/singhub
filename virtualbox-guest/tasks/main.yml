@@ -6,6 +6,7 @@
     with_items: "{{ virtualbox_os_packages }}"
   when: virtualbox_remove_os_packages is defined and virtualbox_remove_os_packages
 
+
 - block:
   - name: If virtualbox_version is set to auto then determine the host version
     local_action: shell vboxmanage --version | awk -F r '{print $1}'
@@ -95,6 +96,19 @@
     shell: rpm -qa > /tmp/before.txt
     when: ansible_os_family == 'RedHat' and ( virtualbox_keep is undefined or not virtualbox_keep )
 
+  - block: 
+    - name: Install EPEL repo.
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+        state: latest #present
+    - name: Import EPEL GPG key.
+      rpm_key:
+        key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+        state: present
+    #- name: Install dkms via epel  ... epel will be enabled from above steps.  some may not like it...
+    #  yum: enablerepo=epel name="dkms" state=present
+    when: ansible_os_family == 'RedHat' 
+
   - name: Install necessary packages for compiling
     package:
       name: "{{ item }}"
@@ -121,9 +135,9 @@
       name: "{{ item }}"
       state: present
     with_items:
-      - kernel-headers
+      - kernel-headers-{{ kernel.stdout }}
       - kernel-devel
-    when: kernel is defined and ansible_os_family == 'RedHat'
+    when: kernel is defined and ansible_os_family == 'RedHat' and kernel.stdout is defined 
 
   - name: Check which packages were installed for Debians
     shell: dpkg-query -l > /tmp/after.txt
@@ -190,7 +204,7 @@
     lineinfile: >
       dest=/etc/fstab
       regexp='^{{ ISO_path }}'
-      line='{{ ISO_path }}	{{ mount_path.stdout }}	iso9660	noauto	0	0'
+      line='{{ ISO_path }}  {{ mount_path.stdout }} iso9660 noauto  0   0'
       state=absent
     when: mounted_ISO | changed
   when: (vbox_guest_version.stdout != "{{ virtualbox_version }}")

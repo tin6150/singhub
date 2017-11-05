@@ -22,6 +22,7 @@
 - hosts: all
   become: true  # sudo, default to root
   roles:
+    #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
     - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
