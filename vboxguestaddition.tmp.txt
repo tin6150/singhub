@@ -1,0 +1,20 @@
+
+VirtualBox Guest Additions installer
+
+/tmp/vbox.0/Makefile.include.header:112: *** Error: unable to find the sources of your current Linux kernel. Specify KERN_DIR=<directory> and run Make again.  Stop.
+Creating user for the Guest Additions.
+Creating udev rule for the Guest Additions kernel module.
+
+/var/log/vboxadd-install.log
+
+
+
+export KERN_DIR=/usr/src/kernels/3.10.0-693.5.2.el7.x86_64
+bash -x /media/cdrom/VBoxLinuxAdditions.run --nox11
+
+
+systemctl | grep vbox
+vboxadd.service                                 loaded active exited    vboxadd.service
+
+
+

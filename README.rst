@@ -90,3 +90,15 @@ for hysterical reason, vagrant and/or some ansible stuff is in this dir
 these files may move in the future...
 or more elaborate version build elsewhere and this dir remains a playground
 
+xref: https://github.com/tin6150/inet-dev-class/tree/master/ansible
+
+
+copied PeterMosmans/virtualbox-guest/ to this dir
+and modified it to work in centos.
+(actually, did he make update yet? should have checked before writting all the extra code!)
+
+anyway, seems to work, need to test on another machine.
+startx doesn't work on the VM yet, some complain about MESA...
+
+2017.1104
+

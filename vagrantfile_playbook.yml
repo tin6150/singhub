@@ -13,20 +13,26 @@
 # vi use
 # : set shiftwidth=2 tabstop=4
 
+
+## TODO
+## instead of yum or apt, should use package module to be platform independent
+## http://docs.ansible.com/ansible/latest/package_module.html
+
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
   roles:
-    - role: PeterMosmans.virtualbox-guest
+    - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
+      # cp whole dir to here to adapt code to work in centos
   tasks:
     - block:
       - name: ensure ntpd is at the latest version
         yum: pkg=ntp state=latest
         notify:
           - restart ntpd
-      - name: latest zsh is present # alt syntax, but i like it less, too name "name" clause
+      - name: latest zsh is present # alt syntax, but i like it less, too many "name" clause
         yum: 
           name: zsh 
           state: latest
