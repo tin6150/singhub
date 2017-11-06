@@ -13,7 +13,9 @@
 #    Not sure when need to use "-" and when don't.  Best to use 4 space tab even for "-" and the next/prev block
 #    especially when the "when" clause is at the end of the block!!
 # vi use
-# : set shiftwidth=2 tabstop=4
+# : set shiftwidth=2 tabstop=4 expandtab list 
+# : syntax on 
+# : retab 
 
 ## Ansible Wisdom (for now)
 ## - the way how OS platform/version is handled, the syntax needed to detect them
@@ -27,7 +29,6 @@
 ##   On the flip side, the "when: ansible_os_family == 'Debian' is tested at the bottom, easy to miss!!
 
 
-## TODO
 ## instead of yum or apt, should use package module to be platform independent
 ## http://docs.ansible.com/ansible/latest/package_module.html
 
@@ -44,8 +45,8 @@
     - block:
       - name: ensure ntpd is at the latest version
         package: 
-		name:  ntp 
-		state: latest
+          name:  ntp 
+          state: latest
         notify:
           - restart ntpd
       - name: latest zsh is present # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when ther eare lots of name clause.
@@ -56,8 +57,9 @@
         # https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/RedHat.yml
       - name: latest lxde is present
         package: 
-	  name: lxde 
-	  state: removed #absent #latest
+          name: lxde 
+          state: removed #absent #latest
+
     # next block for RedHat only
     - block: 
       - name: Install EPEL repo.
@@ -70,26 +72,28 @@
         rpm_key:
           key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
           state: present
+          #validate_certs: no    # still get prompt to accept the key  :(
         # @package-group-name vs @^environment-group-name, see "yum grouplist" and 
         # http://docs.ansible.com/ansible/latest/yum_module.html 
         #when: redhat_desktop == 'xfce'
       - name: Install RedHat X11
         yum: name="@x11" state=present
         ## okay, Xfce and X11 installed, but don't work in virtualbox.  video driver problem
-      when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !! WHY?!
+      when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !!  this condition at the end is both a boon and bane!!
     # next block could be platform neutral if figure out the right syntax and/or package name
-    - block:
-      - name: xfce is present
+    # nope, couldn't get the block clause under package to work.  
+    #- block:
+    #  - name: xfce is present
         #shell: yum --enablerepo=epel -y groupinstall xfce-desktop x11
         #yum: enablerepo=epel name="@Xfce" state=present
-	# can I do it this way?    could it be platform neutral??
-        package: 
-	  - block:
-		enablerepo=epel 
- 	    when ansible_os_family == 'RedHat'
-	  - name: "@Xfce" 
- 	  - state: present
-	
+    # can I do it this way?    could it be platform neutral??
+    #    package: 
+    #      - block:
+    #          enablerepo=epel 
+    #          when ansible_os_family == 'RedHat'
+    #      - name: "@Xfce" 
+    #      - state: present
+    
     - block:
         - name: latest csh is present # trying to exlude this in RedHat.  works.  see result as skip, condition was False.
           apt: pkg=csh state=latest
