@@ -131,9 +131,10 @@
     when: kernel is defined and kernel.stdout is defined and ansible_os_family == 'Debian'
 
   - name: Install latest kernel and headers for CentOSes
-    package:
+    yum:
       name: "{{ item }}"
       state: latest # needed latest for dmks to find matching header 
+      update_cache: yes
     with_items:
       - kernel
       - kernel-headers-{{ kernel.stdout }}
