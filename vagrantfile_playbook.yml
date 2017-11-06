@@ -13,9 +13,12 @@
 #    Not sure when need to use "-" and when don't.  Best to use 4 space tab even for "-" and the next/prev block
 #    especially when the "when" clause is at the end of the block!!
 # vi use
-# : set shiftwidth=2 tabstop=4 expandtab list 
-# : syntax on 
+# : set shiftwidth=2 tabstop=4 expandtab list nu ft=ruby
 # : retab 
+# : syntax on 
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 
 ## Ansible Wisdom (for now)
 ## - the way how OS platform/version is handled, the syntax needed to detect them

@@ -13,15 +13,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box = "base"
   # https://app.vagrantup.com/centos/boxes/7
   #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
-  #config.vm.box = "cent/7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
+  config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
-  #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # what is causing the crash??
+  config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
   #config.vm.box_version = "1708.01"
-  #config.vm.hostname = "vigra7"
+  config.vm.hostname = "viagra7"
   #
-  config.vm.box = "centos-six"	# this doesn't change VM in vbox once the VM has been provisioned!
-  config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
-  config.vm.hostname = "vigra6"
+  #config.vm.box = "centos-six"	# this doesn't change VM in vbox once the VM has been provisioned!
+  #config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
+  #config.vm.hostname = "vigra6"
   #
   config.vm.network :forwarded_port, guest: 5901, host: 5901	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
