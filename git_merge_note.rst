@@ -1,4 +1,7 @@
 
+git branch merge lesson learned
+*******************************
+
 
 i followed this
 https://stackoverflow.com/questions/14168677/merge-development-branch-with-master
