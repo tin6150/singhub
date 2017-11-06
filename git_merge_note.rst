@@ -42,3 +42,12 @@ maybe the `--no-ff` flag for merge would have done mostly what I do.
 git-scm "book" suggest the same process as stated in stack overflow, so i guess it is the way to go.
 https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging
 
+
+PS.
+the merge I did left the pre-merge files behind, eg:
+	vboxguestaddition.tmp.txt.orig
+	virtualbox-guest/tasks/main.yml.orig
+they are not added to git, just stays on the local machine where merge was done.  
+will delete them after I know my stuff works.
+
+
