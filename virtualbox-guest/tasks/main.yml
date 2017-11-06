@@ -8,7 +8,10 @@
 
 - block:
   - name: If virtualbox_version is set to auto then determine the host version
-    local_action: shell vboxmanage --version | awk -F r '{print $1}'
+    #local_action: shell vboxmanage --version | awk -F r '{print $1}'
+    local_action: shell vboxmanage --version | awk -F _ '{print $1}'
+    ## on backbox/Ubuntu14, this result in 4.3.36_Ubuntu  and the _Ubuntu part is creating problem :(
+
     register: host_vbox_version
 
   - name: Check if virtualbox_version could be determined
@@ -43,6 +46,8 @@
 
   - name: Download ISO file when the requested version is not present on the host
     get_url: url=http://download.virtualbox.org/virtualbox/{{ virtualbox_version }}/VBoxGuestAdditions_{{ virtualbox_version }}.iso dest=/root/VBoxGuestAdditions.iso
+    ## tried to fetch     http://download.virtualbox.org/virtualbox/4.3.36_Ubuntu/VBoxGuestAdditions_4.3.36_Ubuntu.iso
+    ## but actual path is http://download.virtualbox.org/virtualbox/4.3.36/VBoxGuestAdditions_4.3.36.iso
     ignore_errors: yes
     when: not file_path.stat.exists and not CD_path.stat.exists
 
@@ -150,7 +155,10 @@
 
     ## centos needed KERN_DIR set to find kernel lib... if Debian has it in same dir then can merge both build clause
   - name: Build and install VBoxGuestAdditions from file for CentOSes
-    shell: /bin/bash KERN_DIR=/usr/src/kernels/{{kernel.stdout }} /media/cdrom/VBoxLinuxAdditions.run --nox11
+    shell: /bin/bash  /media/cdrom/VBoxLinuxAdditions.run --nox11
+    ##shell: /bin/bash KERN_DIR=/usr/src/kernels/{{kernel.stdout }} /media/cdrom/VBoxLinuxAdditions.run --nox11
+    ## maybe cuz there was mismatch b/w uname -r and kernel-headers downloaded
+    ## above syntax give problem on backbox complain PATH don't exist.
     when: ( virtualbox_x11 is undefined or not virtualbox_x11 ) and ansible_os_family == 'RedHat' 
     ignore_errors: yes
 

@@ -35,8 +35,8 @@
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
-  #roles:
-  #  - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
+  roles:
+    - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
       # cp whole dir to here to adapt code to work in centos
