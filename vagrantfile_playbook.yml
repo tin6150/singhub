@@ -27,8 +27,8 @@
 ##    + EPEL vs ??, 
 ##    + yum specific argument that is not supported in package module
 ##    + package name is that specific to platform (eg kernel-header vs linux-header)
-##   it is best to separate out OS specific stuff early on in the hierarchy.
-##   Anoying thing is that the important code of logic flow may need to be split into two files or two blocks :(
+##   it is art to separate out OS specific stuff at the right time on in the hierarchy.
+##   Cuz, the anoying thing is that the important code of logic flow may need to be split into two files or two blocks :(
 ##   On the flip side, the "when: ansible_os_family == 'Debian' is tested at the bottom, easy to miss!!
 
 

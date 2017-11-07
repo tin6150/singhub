@@ -1,22 +1,35 @@
 ---
 # tasks file for virtualbox-guest
 - block:
-  - name: remove os packages version of virtualbox guest additions
+  - name: Remove os packages version of virtualbox guest additions
     package: name="{{ item }}" state="absent" purge="yes"
     with_items: "{{ virtualbox_os_packages }}"
   when: virtualbox_remove_os_packages is defined and virtualbox_remove_os_packages
 
 
 - block:
-  - name: If virtualbox_version is set to auto then determine the host version for Ubuntu/Debian
-    local_action: shell vboxmanage --version | awk -F _ '{print $1}' # Ubuntu return 4.3.36_Ubuntur105129
+  - name: If virtualbox_version is set to auto then determine the host version 
+    local_action: shell vboxmanage --version | awk -F'[r_]' '{print $1}' # Ubuntu return 4.3.36_Ubuntur105129, mac/centos return 5.1.26r117224
     register: host_vbox_version
-    when: ansible_os_family == 'Debian' 
 
-  - name: If virtualbox_version is set to auto then determine the host version for Mac and CentOS
-    local_action: shell vboxmanage --version | awk -F r '{print $1}'  # mac and rhel returns 5.1.26r117224
-    register: host_vbox_version
-    when: ansible_os_family != 'Debian'
+  #- name: If virtualbox_version is set to auto then determine the host version for Ubuntu/Debian
+    #local_action: shell vboxmanage --version | awk -F _ '{print $1}' # Ubuntu return 4.3.36_Ubuntur105129
+    #register: host_vbox_version
+    #when: ansible_os_family == "Debian" 
+    #when: ansible_os_family == "Linuxmint" 
+    #when: ansible_os_family == "Debian" or ansible_os_family == "Linuxmint" 
+    # Linuxmint should be placed as Debian, but may not be in older ansible??  thus needed the extra check.
+    # how does this work??  local_action!!!  
+    # thus vboxmanage --version is run on the host
+    # yet when I check ansible_os_family it is the guest!!
+    # this is giong to need work to find out if there is an ansible_local ?? ansible_local_os_family 
+    # this is not part of the problem with dealing with CentOS guest machine.  so leave this out for now.
+    # actually upstreamd used '[_r]' as separator, good enough!
+
+  #- name: If virtualbox_version is set to auto then determine the host version for Mac and CentOS
+  #  local_action: shell vboxmanage --version | awk -F r '{print $1}'  # mac and rhel returns 5.1.26r117224
+  #  register: host_vbox_version
+  #  when: ansible_os_family != "Debian" and ansible_os_family != "Linuxmint" 
 
   - name: Check if virtualbox_version could be determined
     fail: msg="Could not determine virtualbox_version - please specify this variable"
@@ -29,12 +42,13 @@
 - name: Determine if (the requested version of) vboxguestadditions is installed
   shell: modinfo vboxguest 2>/dev/null|awk '/^version/{print $2}'
   register: vbox_guest_version
-  changed_when: vbox_guest_version.stdout != "{{ virtualbox_version }}"
+  changed_when: vbox_guest_version.stdout != virtualbox_version
   ignore_errors: yes
 
 - block:
   - name: Check if the ISO file is present on the host
-    stat: path=/root/VBoxGuestAdditions.iso
+    stat: path="{{ virtualbox_iso }}"   # got undefined error before, but seems to work now...
+    ##stat: path=/root/VBoxGuestAdditions.iso
     register: file_path
     ignore_errors: yes
 
@@ -80,7 +94,7 @@
       opts=noauto
       state=mounted
     register: mounted_ISO
-    when: mount_path is defined and "{{ mount_path.stdout }}" == ""
+    when: mount_path is defined and mount_path.stdout == ""
 
   - name: Check if VBoxGuest additions ISO is mounted
     shell: mount -l 2>/dev/null|awk '/VBOXADDITIONS/{print $3}'
@@ -113,8 +127,9 @@
       rpm_key:
         key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
         state: present
-    #- name: Install dkms via epel  ... epel will be enabled from above steps.  some may not like it...
+    #- name: Install dkms via epel  
     #  yum: enablerepo=epel name="dkms" state=present
+    #  Actually, epel will be enabled from above steps, thus platform independent way of installing dkms below will work.
     when: ansible_os_family == 'RedHat' 
 
   - name: Install necessary packages for compiling
@@ -217,7 +232,7 @@
     lineinfile: >
       dest=/etc/fstab
       regexp='^{{ ISO_path }}'
-      line='{{ ISO_path }}  {{ mount_path.stdout }} iso9660 noauto  0   0'
+      line='{{ ISO_path }}	{{ mount_path.stdout }}	iso9660	noauto	0	0'
       state=absent
     when: mounted_ISO | changed
-  when: (vbox_guest_version.stdout != "{{ virtualbox_version }}")
+  when: (vbox_guest_version.stdout != virtualbox_version)
