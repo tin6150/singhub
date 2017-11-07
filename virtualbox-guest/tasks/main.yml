@@ -1,5 +1,7 @@
 ---
 # tasks file for virtualbox-guest
+# check syntax by
+# ansible-playbook --syntax-check main.yml  # vagrantfile_playbook.yml
 - block:
   - name: remove os packages version of virtualbox guest additions
     package: name="{{ item }}" state="absent" purge="yes"
@@ -8,11 +10,16 @@
 
 - block:
   - name: If virtualbox_version is set to auto then determine the host version
-    #local_action: shell vboxmanage --version | awk -F r '{print $1}'
-    local_action: shell vboxmanage --version | awk -F _ '{print $1}'
-    ## on backbox/Ubuntu14, this result in 4.3.36_Ubuntu  and the _Ubuntu part is creating problem :(
+    tasks:
+      - command: vboxmanage --version | awk -F r '{print $1}'          # mac resturns 5.1.26r117224
+        register: host_vbox_version
+        when: ansible_os_family == 'Darwin' or ansible_os_family == 'RedHat'      # think redhat fits here...
+      #- local_action: shell vboxmanage --version | awk -F _ '{print $1}'
+      - command: vboxmanage --version | awk -F _ '{print $1}'
+        register: host_vbox_version
+        when: ansible_os_family == 'Debian'
+        ## on backbox/Ubuntu14, this result in 4.3.36_Ubuntur105129  and the _Ubuntu part is creating problem :(
 
-    register: host_vbox_version
 
   - name: Check if virtualbox_version could be determined
     fail: msg="Could not determine virtualbox_version - please specify this variable"
