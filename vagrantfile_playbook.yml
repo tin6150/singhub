@@ -82,6 +82,7 @@
         #when: redhat_desktop == 'xfce'
       - name: Install RedHat X11
         yum: name="@x11" state=present
+	### may not have installed xorg-x11-server-... ...common  ...Xvfb 
         ## okay, Xfce and X11 installed, but don't work in virtualbox.  video driver problem
       when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !!  this condition at the end is both a boon and bane!!
     # next block could be platform neutral if figure out the right syntax and/or package name
