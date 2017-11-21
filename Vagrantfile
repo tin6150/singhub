@@ -13,6 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box = "base"
   # https://app.vagrantup.com/centos/boxes/7
   #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
+  #config.vm.box = "cent7"	#  need to use old name on c7_casa
   config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
   config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?

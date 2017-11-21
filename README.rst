@@ -102,3 +102,17 @@ startx doesn't work on the VM yet, some complain about MESA...
 
 2017.1104
 
+
+Okay, Ansible playground has been moved to 
+CF_BK/cueball/ANSIBLE
+
+with cheatsheet notes at
+https://github.com/tin6150/inet-dev-class/tree/master/ansible
+
+
+This dir may still get some work done on Vagrant and the ansible portion vagrant use
+(mostly the virtualbox guest addition package).
+Not all the ansible YAML code has been migrated yet, but 
+increasinglly expect the cueball (or bofh) repo to become the one ansible that rule them all :)
+
+2017.1110
