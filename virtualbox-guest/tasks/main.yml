@@ -47,8 +47,8 @@
 
 - block:
   - name: Check if the ISO file is present on the host
-    stat: path="{{ virtualbox_iso }}"   # got undefined error before, but seems to work now...
-    ##stat: path=/root/VBoxGuestAdditions.iso
+    ##stat: path="{{ virtualbox_iso }}"   # got undefined error in macos
+    stat: path=/root/VBoxGuestAdditions.iso
     register: file_path
     ignore_errors: yes
 

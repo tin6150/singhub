@@ -14,13 +14,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # https://app.vagrantup.com/centos/boxes/7
   #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
   #config.vm.box = "cent7"	#  need to use old name on c7_casa
-  #config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
-  #config.vm.box = "viagra7"	# this worked, but not getting vboxvideo.ko 
+  config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
-  #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
-  #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # this worked
+  config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
   #config.vm.box_version = "1708.01"
-  #config.vm.hostname = "viagra7"		  # used this for a while, no X.
+  config.vm.hostname = "viagra7"
   #
   #config.vm.box = "centos-six"	# this doesn't change VM in vbox once the VM has been provisioned!
   #config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
@@ -39,10 +37,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #end
 
 
-  # abandoned viagra7, since cli work, but no X 
-  config.vm.define "ubu16" do |ubu16|
-    ubu16.vm.box = "ubuntu/xenial64"
-  end
+  #config.vm.define "ubu16" do |ubu16|
+  #  ubu16.vm.box = "ubuntu/xenial64"
+  #end
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
@@ -179,14 +176,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ## config added by Tin 2017.0917
     config.vm.provision "shell", inline: <<-SHELL
 	touch /Vagrant_provision
-	#yum -y install vim wget curl git autoconf automake libtool tigervnc-server
-	#yum -y install virt-what
+	yum -y install vim wget curl git autoconf automake libtool tigervnc-server
+	yum -y install virt-what
 	#yum -y group install "Server with GUI"
 	#yum -y group install "KDE"
-
-	## ubuntu stuff now:
-	apt-get install vim wget curl git autoconf automake libtool 
-	#tigervnc-server
 
 	### singulairty and example knime container
 	BUILD_SINGULARITY=0	# 0 = omit, don't build.  1 = build it
@@ -205,7 +198,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	### X11 stuff
 	wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
-	#mv 10-monitor.conf /etc/X11/xorg.conf.d/
+	mv 10-monitor.conf /etc/X11/xorg.conf.d/
 	# pff... can't get the resolution to work on virtualbox on macbook.
 	# just use vncserver -geometry 1280x800 
 	
