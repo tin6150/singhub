@@ -161,20 +161,3 @@ increasinglly expect the cueball (or bofh) repo to become the one ansible that r
 
 
 
-~~~~
-tmp
-
-
-
-**^ tin mintbook128 /opt ^**>  sudo ./singularity-builder/singularity_build.sh all --prefix=/opt/singularity-${VER}
-Unknown option: --prefix=/opt/singularity-2.4.1
-**^ tin mintbook128 /opt ^**>  sudo ./singularity-builder/singularity_build.sh all --prefix /opt/singularity-${VER}
-Cloning into 'singularity'...
-remote: Counting objects: 28801, done.
-remote: Compressing objects: 100% (198/198), done.
-remote: Total 28801 (delta 167), reused 218 (delta 107), pack-reused 28496
-Receiving objects: 100% (28801/28801), 5.17 MiB | 2.14 MiB/s, done.
-Resolving deltas: 100% (21170/21170), done.
-Checking connectivity... done.
-Cloned master branch of singularity to /tmp
-
