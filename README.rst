@@ -1,13 +1,55 @@
 singhub
--------
+*******
 
-singularity hub container definition
+| Singing hub, a concert in the making :)
+
+
+This repo has a mix pot of things.
+
+- singularity hub container definition, for things that I am developing, which may or may not be uploaded to singularity-hub.org by V.  If they do, a dedicated git repo will be created for them since that's how singularity-hub need them (eg circos, topspin)
+
+- install: a single script to download and install latest singularity.  submitted PR.  But turns out V already had a similar script, so will use that instead.
+
+
+- various script I use to install singularity and download my favorite containers.
+
+- some random vagrant and ansible stuff that started life here as was using them in conjunction of some project being worked on.  These have been slowly migrating to their own repo, but some snipplet of code may still be found only in here.
+
+
+PS
+
+- environment modules def for singularity are placed in 
+  /home/tin/tin-gh/psg/modulefiles/container/singularity
+
 
 
 --------------------------
 scratch notes while in dev
 --------------------------
 
+Using V's script to install singularity (2.4.1)
+
+sudo chgrp tin /opt
+sudo chmod g+w /opt
+
+cd /opt
+git clone https://github.com/singularityware/singularity-builder
+
+VER=2.4.1
+=2.4.1
+sudo ./singularit-builder/singularity_build.sh all --prefix /opt/singularity-${VER}
+
+
+# create new env module in /home/tin/tin-gh/psg/modulefiles/container/singularity
+
+module load container/singularity/${VER}
+singularity selftest
+
+
+mkdir /opt/sing-shub 
+cd    /opt/sing-shub 
+
+singularity pull ...chrome
 
 
 ~~~~
@@ -116,3 +158,23 @@ Not all the ansible YAML code has been migrated yet, but
 increasinglly expect the cueball (or bofh) repo to become the one ansible that rule them all :)
 
 2017.1110
+
+
+
+~~~~
+tmp
+
+
+
+**^ tin mintbook128 /opt ^**>  sudo ./singularity-builder/singularity_build.sh all --prefix=/opt/singularity-${VER}
+Unknown option: --prefix=/opt/singularity-2.4.1
+**^ tin mintbook128 /opt ^**>  sudo ./singularity-builder/singularity_build.sh all --prefix /opt/singularity-${VER}
+Cloning into 'singularity'...
+remote: Counting objects: 28801, done.
+remote: Compressing objects: 100% (198/198), done.
+remote: Total 28801 (delta 167), reused 218 (delta 107), pack-reused 28496
+Receiving objects: 100% (28801/28801), 5.17 MiB | 2.14 MiB/s, done.
+Resolving deltas: 100% (21170/21170), done.
+Checking connectivity... done.
+Cloned master branch of singularity to /tmp
+
