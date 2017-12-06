@@ -31,13 +31,11 @@ Using V's script to install singularity (2.4.1)
 
 sudo chgrp tin /opt
 sudo chmod g+w /opt
-
 cd /opt
 git clone https://github.com/singularityware/singularity-builder
 
-VER=2.4.1
-=2.4.1
-sudo ./singularit-builder/singularity_build.sh all --prefix /opt/singularity-${VER}
+VER=2.4.2
+sudo /opt/singularity-builder/singularity_build.sh  all --prefix /opt/singularity-${VER}
 
 
 # create new env module in /home/tin/tin-gh/psg/modulefiles/container/singularity
