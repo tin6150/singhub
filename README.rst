@@ -49,6 +49,8 @@ cd    /opt/sing-shub
 
 singularity pull ...chrome
 
+singularity pull shub://truatpasteurdotfr/singularity-docker-centos7-google-chrome
+
 
 ~~~~
 
@@ -75,7 +77,15 @@ sudo cp /tmp/motd /etc
 
 ~~~~
 
-Creating containers
+Creating containers  2.4.2 days
+
+sudo    /opt/singularity-2.4.2/bin/singularity build -w ./sl6_lbl.simg ./sl6_lbl.def
+
+
+
+~~~~
+
+Creating containers  2.2 days
 
 sudo    /e/bin/singularity create --size 3200 topspin.img
 sudo -E /e/bin/singularity bootstrap topspin.img centos7_topspin.def 
