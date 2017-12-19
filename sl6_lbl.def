@@ -1,8 +1,11 @@
 
 # Singularity container definition 
 # Provide SL6 env in the upgraded SL7 cluster infrastructure
+# Also contain a set of performance tools
 
 # maybe centos 6 since sl7 is a pain to get right now.
+# most of this container is in https://tin6150@github.com/tin6150/perf_tools
+
 
 BootStrap: docker
 From: centos:6
@@ -10,14 +13,32 @@ From: centos:6
 #From: ringo:scientific:6.5
 
 %runscript
-	echo "This is what happens when you run the container..."
-	#/bin/bash
+	echo "bash from inside the container..."
+	/bin/bash
 
 
 %post
 	echo "Hello from inside the container"
-	yum -ty install vim bash wget curl tar coreutils which util-linux-ng \
-			libpng libpng-devel libpng-static 
+	yum -ty install vim bash wget curl tar coreutils which util-linux-ng man \
+			environment-modules \
+			libpng libpng-devel libpng-static \
+			openmotif openmotif-devl openmotif22 \
+			ipmitool \
+			epel-release  # sl6 may need diff mech to enable epel
+
+
+	# performance tools, many are from epel
+	yum -ty install \
+			iperf3 iperf3 perf sysstat \
+			ethtool iftop telnet \
+			nmap nuttcp iptraf iptraf-ng \
+			htop ntop \
+			powertop     # does not seems to work
+
+			# systsat includes: sar iostat mpstat 
+			# net-tools: mii-tool  
+			# iputils: tracepath \
+			
 
 	touch /THIS_IS_INSIDE_SINGULARITY
 

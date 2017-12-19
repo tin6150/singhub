@@ -81,7 +81,10 @@ Creating containers  2.4.2 days
 
 sudo    /opt/singularity-2.4.2/bin/singularity build -w ./sl6_lbl.simg ./sl6_lbl.def
 
+# nah, globus it, so i don't have to constantly login --nope, wrong FS
+scp sl6_lbl.simg tin@lrc-xfer:/global/scratch/tin/singularity-repo/
 
+singularity shell -B /global/software/sl-6.x86_64/ sl6_lbl.simg
 
 ~~~~
 
