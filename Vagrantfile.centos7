@@ -1,3 +1,5 @@
+# vim: set syntax syntax on 
+# v#@#im: set syntax=ruby syntax on ft=ruby :
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -16,7 +18,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box = "cent7"	#  need to use old name on c7_casa
   config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
-  config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
+  #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
+  config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1805_01.VirtualBox.box'    # 2018.0913
   #config.vm.box_version = "1708.01"
   config.vm.hostname = "viagra7"
   #
@@ -176,7 +179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ## config added by Tin 2017.0917
     config.vm.provision "shell", inline: <<-SHELL
 	touch /Vagrant_provision
-	yum -y install vim wget curl git autoconf automake libtool tigervnc-server
+	yum -y install vim wget curl git autoconf automake libtool tigervnc-server ansible
 	yum -y install virt-what
 	#yum -y group install "Server with GUI"
 	#yum -y group install "KDE"
