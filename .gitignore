@@ -1,0 +1,2 @@
+# .retry are ansible transient play script
+*.retry 
