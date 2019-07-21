@@ -1,9 +1,21 @@
 #!/bin/bash
 
 # This script install singularity.  eg run as:
-# sudo ./install --prefix=/opt --build=2.4.beta
+#    sudo ./install --prefix=/opt --build=2.4.beta
+#    sudo ./install --prefix=/opt --build=2.5.2  	# currently in lrc 2019.07
+#    sudo ./install --prefix=/opt --build=2.6		# have to change line below to git check out right version
+# intended to work as single command (with wget...|sh) to install singularity
+# think tried to do PR, but then Vanessa said there were something else?  that she has in mind? ...
+# never pushed it at the end.
+# but I can use it myself!  -Tin
 
-# libtool need to be installed for autogen to work
+# libtool need to be installed for autogen to work, eg:
+# sudo apt install libtool automake autoconf
+## autogen not in 3.x release anymore... so this only work for older up to 2.6.2 ...
+
+# think there was some env module thing
+# was it template or creation script?  
+# can't find that anymore... so just using sym link to bin for now
 
 # option parsing ref: 
 # https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
@@ -84,9 +96,13 @@ else
 	# update code before install
 	cd    ${GITSOURCE}/singularity
 	git pull
+	# instruction likely drastically changed with 3.x, so old did not address the changes  
+	#git checkout origin/vault/release-2.5  # 2.5.2, same as in lrc
+	git checkout origin/vault/release-2.6 # have problem doing this in shell?
 fi
 
 cd    ${GITSOURCE}/singularity
+## not in 3.x release anymore... so this only work for older up to 2.6.2 ...
 ./autogen.sh
 EXITCODE=$?
 if [[ $EXITCODE -gt 0 ]]; then
