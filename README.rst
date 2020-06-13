@@ -4,7 +4,28 @@ singhub
 | Singing hub, a concert in the making :)
 
 
-This repo has a mix pot of things.
+
+This repo used a mix pot of things.
+**But now it is being used really to setup VM via vagrant**
+
+
+- some random vagrant and ansible stuff that started life here as was using them in conjunction of some project being worked on.  These have been slowly migrating to their own repo, but some snipplet of code may still be found only in here.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                                         ~ 8 ~
+                             **rest probably osbolete**
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+- Sinuglarity 3 install notes in CF_BK/sw/
+- container I build have a dedicated dir for each container now, as Singularity Hub for a while expected a repo with a static 'Singularity' file there, didn't even accept a .def :/
+  I am also doing Dockerfile that invoke shell script to do install, the Singularity is mostly just a wrapper.
+
+
+
 
 - singularity hub container definition, for things that I am developing, which may or may not be uploaded to singularity-hub.org by V.  If they do, a dedicated git repo will be created for them since that's how singularity-hub need them (eg circos, topspin)
 
@@ -13,7 +34,6 @@ This repo has a mix pot of things.
 
 - various script I use to install singularity and download my favorite containers.
 
-- some random vagrant and ansible stuff that started life here as was using them in conjunction of some project being worked on.  These have been slowly migrating to their own repo, but some snipplet of code may still be found only in here.
 
 
 PS
