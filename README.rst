@@ -7,6 +7,8 @@ singhub
 
 This repo used a mix pot of things.
 **But now it is being used really to setup VM via vagrant**
+overall, see README.vagrant.rst and https://tin6150.github.io/psg/vagrant.html
+
 
 
 - some random vagrant and ansible stuff that started life here as was using them in conjunction of some project being worked on.  These have been slowly migrating to their own repo, but some snipplet of code may still be found only in here.

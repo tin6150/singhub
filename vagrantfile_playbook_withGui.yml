@@ -1,5 +1,7 @@
 ---
 
+# this one install X11, Mate, too big for small VM :/
+
 #
 # example ansible playbook file that expect vagrant provision to run
 # http://people.redhat.com/mskinner/rhug/q2.2017/Ansible-Hands-on-Introduction.pdf p23
@@ -80,14 +82,14 @@
         # @package-group-name vs @^environment-group-name, see "yum grouplist" and 
         # http://docs.ansible.com/ansible/latest/yum_module.html 
         #when: redhat_desktop == 'xfce'
-        #- name: Install RedHat X11
-        #yum: name="@x11" state=present
+      - name: Install RedHat X11
+        yum: name="@x11" state=present
         ### may not have installed xorg-x11-server-... ...common  ...Xvfb 
         ## okay, Xfce and X11 installed, but don't work in virtualbox.  video driver problem
         ## x11 is for centos6, not 7?
-        #- name: Install MATE
-        #yum: name="@MATE" state=present
-        #when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "7"
+      - name: Install MATE
+        yum: name="@MATE" state=present
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "7"
 
       when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !!  this condition at the end is both a boon and bane!!
     # next block could be platform neutral if figure out the right syntax and/or package name

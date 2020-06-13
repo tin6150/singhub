@@ -17,7 +17,7 @@ using stuff that was done for desktop setup (eg wsl_... under cueball)
 
 ::
 
-	ln -s Vagrantfile.centos7 Vagrantfile
+	cp -p Vagrantfile.centos8 Vagrantfile
 	vagrant up
 	vagrant status
 
