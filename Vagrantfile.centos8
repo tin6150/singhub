@@ -1,7 +1,14 @@
-# vim: set syntax syntax on 
-# v#@#im: set syntax=ruby syntax on ft=ruby :
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+# vim: filetype=ruby shiftwidth=2 tabstop=2 noexpandtab nosmarttab noautoindent nosmartindent paste 
+#
+# note that filetype=... set shiftwidth, settings are parsed left to right, last one stays.
+# so if have things like shiftwidth=8 tabstop=8 filetype=ruby
+# the filetype setting will reset tabstop back to 2 spaces
+
+# XXvim: set syntax syntax on  nonum paste
+# XXvi: set ft=ruby : paste tabstop=4
+
+	# <-- tab here
+#2345678
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
@@ -16,6 +23,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # https://app.vagrantup.com/centos/boxes/7
   #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
   #config.vm.box = "cent7"	#  need to use old name on c7_casa
+
+
+  # need to find way to fix VirtualBox image name/path, this one seems to be
+  # /home/tin/VirtualBox VMs/vagrant_centos7_default_1592008049000_63100
   config.vm.box = "viagra8"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
@@ -159,6 +170,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.provider "virtualbox" do |vb|
       # Display the VirtualBox GUI when booting the machine
+      #vb.gui = true
+      #vb.gui = false # ie headless mode
       vb.gui = true
    
       # Customize the amount of memory on the VM:
@@ -178,8 +191,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #   apt-get install -y apache2
   # SHELL
 
-    ## config added by Tin 2017.0917
-    config.vm.provision "shell", inline: <<-SHELL
+	## config added by Tin 2017.0917
+	config.vm.provision "shell", inline: <<-SHELL
 	touch /Vagrant_provision
 	yum -y install vim wget curl git autoconf automake libtool tigervnc-server ansible
 	yum -y install virt-what
@@ -217,11 +230,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		git clone https://tin6150@github.com/tin6150/singhub
 	fi
 
-    SHELL
+	SHELL
 
-    #
-    # Run Ansible from the Vagrant Host
-    # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
+  #
+  # Run Ansible from the Vagrant Host
+  # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
     # can i have both shell provision and ansible??  
     #
     config.vm.provision "ansible" do |ansible|
