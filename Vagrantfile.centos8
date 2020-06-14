@@ -40,7 +40,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
   #config.vm.hostname = "vigra6"
   #
-  config.vm.network :forwarded_port, guest: 5901, host: 5901	# vncserver :1 # hopefully cli works
+  config.vm.network :forwarded_port, guest: 5901, host: 5908	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
@@ -177,7 +177,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
-      vb.memory = "2330"		
+      vb.memory = "2330"
   end
   #
   # View the documentation for the provider you are using for more
@@ -191,57 +191,79 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #   apt-get install -y apache2
   # SHELL
 
-	## config added by Tin 2017.0917
-	config.vm.provision "shell", inline: <<-SHELL
-	touch /Vagrant_provision
-	yum -y install vim wget curl git autoconf automake libtool tigervnc-server ansible
-	yum -y install virt-what
-	#yum -y group install "Server with GUI"
-	#yum -y group install "KDE"
+  ## config added by Tin 2017.0917
+  config.vm.provision "shell", inline: <<-SHELL
+  touch   /Vagrant_provision
+  date >> /Vagrant_provision
+  yum -y install vim wget curl git autoconf automake libtool tigervnc-server 
+  yum -y install virt-what
+  yum -y install epel-release
+  yum -y install ansible
+  #yum -y group install "Server with GUI"
+  #yum -y group install "KDE"
 
-	### singulairty and example knime container
-	BUILD_SINGULARITY=0	# 0 = omit, don't build.  1 = build it
-	if [[ x$BUILD_SINGULARITY == x1 ]] ; then
-		[[ -d /opt ]] || mkdir /opt
-		cd /opt
-		wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
-		bash install --prefix=/opt --build=2.4
-	fi
-	GET_KNIME=0
-	if [[ x$GET_KNIME == x1 ]] ; then
-		KNIMEIMG=tin6150-knime-withFullExtension.img
-		##[[ -f $KNIMEIMG ]] || /opt/singularity-2.4/bin/singularity pull shub://tin6150/knime:withFullExtension
-		# seems to have java by default, so no need to install that
-	fi
+  ### singulairty and example knime container
+  BUILD_SINGULARITY=0  # 0 = omit, don't build.  1 = build it
+  if [[ x$BUILD_SINGULARITY == x1 ]] ; then
+    [[ -d /opt ]] || mkdir /opt
+    cd /opt
+    wget -nc https://raw.githubusercontent.com/tin6150/singhub/master/install -O install
+    bash install --prefix=/opt --build=2.4
+  fi
+  GET_KNIME=0
+  if [[ x$GET_KNIME == x1 ]] ; then
+    KNIMEIMG=tin6150-knime-withFullExtension.img
+    ##[[ -f $KNIMEIMG ]] || /opt/singularity-2.4/bin/singularity pull shub://tin6150/knime:withFullExtension
+    # seems to have java by default, so no need to install that
+  fi
 
-	### X11 stuff
-	wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
-	mv 10-monitor.conf /etc/X11/xorg.conf.d/
-	# pff... can't get the resolution to work on virtualbox on macbook.
-	# just use vncserver -geometry 1280x800 
-	
-	### my favorite config and stuff
-	cd $HOME
-	wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc
-	if [[ ! -d tin-gh ]] ; then
-		mkdir tin-gh 
-		cd    tin-gh
-		git clone https://tin6150@github.com/tin6150/psg
-		git clone https://tin6150@github.com/tin6150/singhub
-	fi
+  ### X11 stuff
+  wget https://raw.githubusercontent.com/tin6150/psg/master/conf/X11/10-monitor.conf -O 10-monitor.conf
+  mv 10-monitor.conf /etc/X11/xorg.conf.d/
+  # pff... can't get the resolution to work on virtualbox on macbook.
+  # just use vncserver -geometry 1280x800 
+  
+  ### my favorite config and stuff
+  cd $HOME # this end up in /root :-/
+  # ansible somehow also end up expecting /home/tin/.ansible 
+  # so creating that dir manually
+  mkdir -p /home/tin
+  cd       /home/tin
+  # FIXME below, may accidentally overwrite .bashrc in future...
+  wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc 
+  if [[ ! -d tin-gh ]] ; then
+    mkdir tin-gh 
+    cd    tin-gh
+    git clone https://tin6150@github.com/tin6150/psg
+    git clone https://tin6150@github.com/tin6150/singhub
+  fi
 
-	SHELL
+  # ansible run keep getting
+  # Unable to create local directories(/home/tin/.ansible/cp): [Errno 13] Permission denied: '/home/tin/.ansible/cp'
+  mkdir -p     /home/tin/.ansible
+  mkdir -p     /home/tin/.ansible/cp
+  chmod -R 777 /home/tin/.ansible
+  chown -R vagrant /home/tin/.ansible
+  mkdir -p     /home/vagrant/.ansible
+  mkdir -p     /home/vagrant/.ansible/cp
+  chmod -R 777 /home/vagrant/.ansible
+  chown -R vagrant /home/vagrant/.ansible
+  sudo -u vagrant id -a
+  sudo -u vagrant touch /tmp/test-user-vagrant
+  SHELL
 
   #
   # Run Ansible from the Vagrant Host
   # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
-    # can i have both shell provision and ansible??  
-    #
-    config.vm.provision "ansible" do |ansible|
-      ansible.verbose = "v"
+  # can i have both shell provision and ansible??  Yes
+  # multiple provisioning expected to run in sequence
+  # https://www.vagrantup.com/docs/provisioning/basic_usage.html#multiple-provisioners
+  # shell script section above ran, then ansible section below get executed
+  config.vm.provision "ansible" do |ansible|
+      ansible.verbose = "vvvv"
       #ansible.become = "true"
       #ansible.become_user = "root"
       ansible.playbook = "vagrantfile_playbook.yml"
-    end
+  end
 
 end
