@@ -1,53 +1,57 @@
-Based o  Peter Mosmans virtualbox-guest.
-Updated to work in CentOS env.
+# Ansible Role: virtualbox-guest
 
+Build status for this role: [![Build
+Status](https://travis-ci.org/PeterMosmans/ansible-role-virtualbox-guest.svg)](https://travis-ci.org/PeterMosmans/ansible-role-virtualbox-guest)
 
-Ansible Role: virtualbox-guest
-=====================
+This role builds, installs and configures the requested VirtualBox guest
+additions. It searches the guest for a mounted ISO containing the
+VBoxGuestAdditions, or an ISO file. When not found, it can download the
+necessary ISO file directly from `download.virtualbox.org`.
 
-Build status for this role: [![Build Status](https://travis-ci.org/PeterMosmans/ansible-role-virtualbox-guest.svg)](https://travis-ci.org/PeterMosmans/ansible-role-virtualbox-guest)
+## Requirements
 
+None, all prerequisites will be installed (and can be removed afterwards). If
+you don't set the **virtualbox_keep** variable to true, all packages that were
+installed for building will be removed (the installed packages will be exactly
+the same as before executing the role).
 
-This role installs and configures the requested VirtualBox guest additions. Expected is either a mounted ISO containing the VBoxGuestAdditions, or an ISO file in /root/VBoxGuestAdditions.iso.
+- bzip2
+- dkms
+- gcc
+- make
+- linux-headers
 
-Requirements
-------------
+## Role Variables
 
-None, all prerequisites will be installed (and can be removed afterwards). If you don't set the **virtualbox_keep** variable to true, all packages that were installed for building will be removed (the installed packages will be exactly the same as before executing the role).
-  - bzip2
-  - dkms
-  - gcc
-  - make
-  - linux-headers
+Available variables are listed below, along with default values.
 
+**virtualbox_keep**: A boolean stating whether the packages necessary for
+compiling should be kept on the system. If not specified, defaults to no.
 
-Role Variables
---------------
+**virtualbox_iso**: The location on the guest where the ISO is expected. Note
+that this file will be removed after successful compiling.
 
-Available variables are listed below, along with default values
+**virtualbox_remove_os_packages**: A boolean stating whether to remove any
+previously installed VirtualBox packages. If not specified, defaults to no.
 
-**virtualbox_keep**: A boolean stating whether the packages necessary for compiling should be kept on the system. If not specified, defaults to no.
+**virtualbox_version**: The requested version of VirtualBox. If the current
+version does not match that version, it will try to (re)install VirtualBox guest
+additions. If set to `auto`, it will try to determine the VirtualBox version of
+the host system. The defaults can be found in `defaults/main.yml`.
 
-**virtualbox_remove_os_packages**: A boolean stating whether to remove any previously installed VirtualBox packages. If not specified, defaults to no.
-
-**virtualbox_version**: The requested version of VirtualBox. If the current version does not match that version, it will try to (re)install VirtualBox guest additions. If set to `auto`, it will try to determine the VirtualBox version of the host system. The defaults can be found in ```defaults/main.yml```.
 ```
 virtualbox_version: auto
 ```
 
-**virtualbox_x11**: A boolean stating whether VirtualBox guest additions will be compiled with x11 support. If not specified, defaults to no.
+**virtualbox_x11**: A boolean stating whether VirtualBox guest additions will be
+compiled with x11 support. If not specified, defaults to no.
 
-
-
-Dependencies
-------------
+## Dependencies
 
 None.
 
+## Example Playbook
 
-
-Example Playbook
-----------------
 ```
 - hosts: all
   become: yes
@@ -55,18 +59,16 @@ Example Playbook
   roles:
     - role: PeterMosmans.virtualbox-guest
 ```
-This example will install VirtualBox guest additions, and will not keep the build packages to the system if they needed to be installed for this role.
 
+This example will install VirtualBox guest additions, and will **not** keep the
+build packages to the system if they are needed to install them.
 
-License
--------
+## License
 
 GPLv3
 
-
-Author Information
-------------------
+## Author Information
 
 Created by Peter Mosmans.
 
-Contributions by Isaac Kim and Fred Leger.
+Contributions by Isaac Kim, Fred Leger and many others: see [https://github.com/PeterMosmans/ansible-role-virtualbox-guest/graphs/contributors]

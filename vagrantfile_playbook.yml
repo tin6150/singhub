@@ -27,7 +27,7 @@
 ## Ansible Wisdom (for now)
 ## - the way how OS platform/version is handled, the syntax needed to detect them
 ##   and the number of things that are still platform specific 
-##    + yum vs apt, 
+##    + yum vs apt vs dnf, 
 ##    + EPEL vs ??, 
 ##    + yum specific argument that is not supported in package module
 ##    + package name is that specific to platform (eg kernel-header vs linux-header)
@@ -46,6 +46,7 @@
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
       # cp whole dir to here to adapt code to work in centos
+      # cp -pr ~/.ansible/roles/PeterMosmans.virtualbox-guest ./virtualbox-guest 
   tasks:
     # next block is platform neutral
     - block:
