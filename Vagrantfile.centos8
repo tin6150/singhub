@@ -32,6 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1805_01.VirtualBox.box'    # 2018.0913
   #config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.0.1905-1.x86_64.vagrant-virtualbox.box' # centos 8 2019
+ #++ config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-2004_01.VirtualBox.box'
   config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.1.1911-20200113.3.x86_64.vagrant-virtualbox.box' # 2020.0113
   #config.vm.box_version = "1708.01"
   config.vm.hostname = "viagra8"
@@ -198,7 +199,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   yum -y install vim wget curl git autoconf automake libtool tigervnc-server 
   yum -y install virt-what
   yum -y install epel-release
-  yum -y install ansible python
+  yum -y install ansible
+  #yum -y install python2  # rhel8 call this python2, and neeeded by ansible
+  ln -s /usr/bin/python3 /usr/bin/python # ansible call unversioned of python, which isn't avail in rhel8 :/
   #yum -y group install "Server with GUI"
   #yum -y group install "KDE"
 
@@ -249,6 +252,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # shell script section above ran, then ansible section below get executed
   config.vm.provision "ansible" do |ansible|
       ansible.verbose = "vvv"
+      #ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=auto " # does NOT mytigate no /usr/bin/python in rhel8
       #ansible.become = "true"
       #ansible.become_user = "root"
       ansible.playbook = "vagrantfile_playbook.yml"

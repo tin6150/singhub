@@ -17,7 +17,8 @@ using stuff that was done for desktop setup (eg wsl_... under cueball)
 
 ::
 
-	cp -p Vagrantfile.centos8 Vagrantfile
+	# cp -p Vagrantfile.centos8 Vagrantfile
+	export VAGRANT_FILE=Vagrantfile.centos8 
 	vagrant up
 	vagrant status
 

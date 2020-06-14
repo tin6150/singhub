@@ -27,7 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
   #config.vm.hostname = "vigra6"
   #
-  config.vm.network :forwarded_port, guest: 5901, host: 5901	# vncserver :1 # hopefully cli works
+  config.vm.network :forwarded_port, guest: 5901, host: 5907	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
