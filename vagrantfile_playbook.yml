@@ -35,14 +35,15 @@
 ##   Cuz, the anoying thing is that the important code of logic flow may need to be split into two files or two blocks :(
 ##   On the flip side, the "when: ansible_os_family == 'Debian' is tested at the bottom, easy to miss!!
 
-
+# ansible localhost -m setup # get list of vars/facts
 
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
   roles:
-    #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
+    #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest, no support for centos8/dnf yet as of 2020.0614
     - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
       # cp whole dir to here to adapt code to work in centos
@@ -50,12 +51,24 @@
   tasks:
     # next block is platform neutral
     - block:
+      - name: ensure chrony is at the latest version for centos8 via dnf
+        package: 
+          name:  chrony 
+          state: latest
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8  # no else either ansible :/
       - name: ensure ntpd is at the latest version
         package: 
           name:  ntp 
           state: latest
         notify:
           - restart ntpd
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+      - name: ensure chrony is at the latest version for centos8
+        package: 
+          name:  chrony 
+          state: latest
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+
       - name: latest zsh is present # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when ther eare lots of name clause.
         package: 
           name: zsh 
@@ -71,7 +84,7 @@
     - block: 
       - name: dummy rhel only task 
         shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-      when: ansible_os_family == "RedHat" # use blok to define this for multiple tasks, but has to be at the end !!  this condition at the end is both a boon and bane!!
+      when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  
 
 
 
