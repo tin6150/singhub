@@ -10,6 +10,7 @@
 	# <-- tab here
 #2345678
 
+
 # tin 2020.0614
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -25,6 +26,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # https://app.vagrantup.com/freebsd/boxes/FreeBSD-11.4-RELEASE
   config.vm.box = "freebsd/FreeBSD-11.4-RELEASE"
   config.vm.box_version = "2020.06.12"
+
+  # seems like the next 1 or 2 param cannot be specified if the VM hasn't been created yet:
   config.vm.box = "boo11"
   config.vm.hostname = "boo11"
 
