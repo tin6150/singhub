@@ -25,5 +25,9 @@ using stuff that was done for desktop setup (eg wsl_... under cueball)
 	vagrant ssh
 
 
-
+	VAGRANT_FILE=Vagrantfile.centos7 vagrant ssh  
+	does NOT get into the VM defined by the alternate definition.
+	May have to create multiple directory for each.
+	Which means linking the ansible playbook, or skipping them :/
+	it may have to do with vagrant init...
 

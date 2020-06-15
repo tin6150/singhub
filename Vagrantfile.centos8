@@ -196,6 +196,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: <<-SHELL
   touch   /Vagrant_provision
   date >> /Vagrant_provision
+  echo "rhel8 yum redirect to dnf"
   yum -y install vim wget curl git autoconf automake libtool tigervnc-server 
   yum -y install virt-what
   yum -y install epel-release

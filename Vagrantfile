@@ -27,21 +27,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # need to find way to fix VirtualBox image name/path, this one seems to be
   # /home/tin/VirtualBox VMs/vagrant_centos7_default_1592008049000_63100
-  config.vm.box = "viagra8"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
+  config.vm.box = "viagra7"	# strange, when used name of centos/7, caused crash with vagrant 1.4.3 (backbay, based off ubuntu 14.04
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-Vagrant-1505-x86_64-01.box'  # link exist, but causes crash...
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1710_01.VirtualBox.box'    # change config.vm.box to new name resolved the prev crash problem.  some weired thing stuck in the box image?
   #config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-1805_01.VirtualBox.box'    # 2018.0913
   #config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.0.1905-1.x86_64.vagrant-virtualbox.box' # centos 8 2019
- #++ config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-2004_01.VirtualBox.box'
-  config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.1.1911-20200113.3.x86_64.vagrant-virtualbox.box' # 2020.0113
+  config.vm.box_url = 'http://cloud.centos.org/centos/7/vagrant/x86_64/images/CentOS-7-x86_64-Vagrant-2004_01.VirtualBox.box'
+  #--config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.1.1911-20200113.3.x86_64.vagrant-virtualbox.box' # 2020.0113
   #config.vm.box_version = "1708.01"
-  config.vm.hostname = "viagra8"
+  config.vm.hostname = "viagra7"
   #
   #config.vm.box = "centos-six"	# this doesn't change VM in vbox once the VM has been provisioned!
   #config.vm.box_url = 'http://cloud.centos.org/centos/6/vagrant/x86_64/images/CentOS-6-x86_64-Vagrant-1710_01.VirtualBox.box'
   #config.vm.hostname = "vigra6"
   #
-  config.vm.network :forwarded_port, guest: 5901, host: 5908	# vncserver :1 # hopefully cli works
+  config.vm.network :forwarded_port, guest: 5901, host: 5907	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
@@ -196,6 +196,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: <<-SHELL
   touch   /Vagrant_provision
   date >> /Vagrant_provision
+  echo "rhel8 yum redirect to dnf"
   yum -y install vim wget curl git autoconf automake libtool tigervnc-server 
   yum -y install virt-what
   yum -y install epel-release
