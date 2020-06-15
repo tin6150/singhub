@@ -1,0 +1,136 @@
+---
+# vim: filetype=yaml shiftwidth=2 tabstop=2 list expandtab nosmarttab noautoindent nosmartindent
+# paste mode will disable expandtab :-/
+# and yaml will barf when line start with a tab
+
+#
+# example ansible playbook file that expect vagrant provision to run
+# http://people.redhat.com/mskinner/rhug/q2.2017/Ansible-Hands-on-Introduction.pdf p23
+# https://www.vagrantup.com/docs/provisioning/ansible_intro.html
+#
+# yaml quirky: 
+# --- means start of doc
+# ... means end of doc (but often not seen)
+# like python, space matter!  it dictates the hierarchy
+#    but the "-" to define list has to stick out for visibility.  this make shifting block level a real PITA  !!!! :( 
+#    Not sure when need to use "-" and when don't.  Best to use 4 space tab even for "-" and the next/prev block
+#    especially when the "when" clause is at the end of the block!!
+
+# 
+# vi use (somehow dont always work in modeline, even when all these are args for :set :-/
+# : set filetype=yaml shiftwidth=2 tabstop=2 expandtab list nu 
+# these may need to be invoked manually:
+# : retab 
+# : syntax on 
+
+
+## Ansible Wisdom (for now)
+## - the way how OS platform/version is handled, the syntax needed to detect them
+##   and the number of things that are still platform specific 
+##    + yum vs apt vs dnf, 
+##    + EPEL vs ??, 
+##    + yum specific argument that is not supported in package module
+##    + package name is that specific to platform (eg kernel-header vs linux-header)
+##   it is art to separate out OS specific stuff at the right time on in the hierarchy.
+##   Cuz, the anoying thing is that the important code of logic flow may need to be split into two files or two blocks :(
+##   On the flip side, the "when: ansible_os_family == 'Debian' is tested at the bottom, easy to miss!!
+
+# ansible localhost -m setup # get list of vars/facts
+
+#- hosts: ansible_os_family == "RedHat" # this don't work.  
+- hosts: all
+  become: true  # sudo, default to root
+  roles:
+    #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest, no support for centos8/dnf yet as of 2020.0614
+    - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+      # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
+      # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
+      # cp whole dir to here to adapt code to work in centos
+      # cp -pr ~/.ansible/roles/PeterMosmans.virtualbox-guest ./virtualbox-guest 
+  tasks:
+    # next block is platform neutral
+    - block:
+      - name: ensure chrony is at the latest version for centos8 via dnf
+        package: 
+          name:  
+            - chrony 
+            #- podman-docker 
+          state: latest
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8  # no else either ansible :/
+      - name: ensure ntpd is at the latest version
+        package: 
+          name:  ntp 
+          state: latest
+        notify:
+          - restart ntpd
+        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+
+      - name: latest zsh is present # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when ther eare lots of name clause.
+        package: 
+          name: 
+            - zsh 
+            - spectre-meltdown-checker 
+          state: latest
+
+        # lxde is not in epel either.  maybe use xfce, which use GDM.  MATE use LightDM and don't want to mess with that.
+        # https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/RedHat.yml
+      - name: latest lxde is absent #removed #present
+        package: 
+          name: lxde 
+          state: absent #removed #absent #latest
+
+    # block END
+
+    # next block for RedHat only
+    - block: 
+      - name: dummy rhel only task 
+        shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+      - name: "rhel 8 packages install via dnf (so it add dependencies)"
+        dnf: 
+          name:  
+            - bc
+            - cvs
+            #- containers-common
+            #- python3-setools
+            #- container-selinux
+            #- podman        # this wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
+            #- podman-docker # this wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
+            # but complain actually is Cannot download Packages/podman-1.6.4-4.module_el8.1.0+298+41f9343a.x86_64.rpm, can't find mirrors or some such
+          state: installed
+        when: ansible_distribution_major_version|int >= 8  # essentially nested if
+      when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  
+
+
+
+    # next block could be platform neutral if figure out the right syntax and/or package name
+    # nope, couldn't get the block clause under package to work.  
+    #- block:
+    #  - name: xfce is present
+        #shell: yum --enablerepo=epel -y groupinstall xfce-desktop x11
+        #yum: enablerepo=epel name="@Xfce" state=present
+    # can I do it this way?    could it be platform neutral??
+    #    package: 
+    #      - block:
+    #          enablerepo=epel 
+    #          when ansible_os_family == 'RedHat'
+    #      - name: "@Xfce" 
+    #      - state: present
+
+
+    - block:
+        - name: latest csh is present # trying to exlude this in RedHat.  works.  see result as skip, condition was False.
+          apt: pkg=csh state=latest
+      when: ansible_os_family == "Debian"  
+      # INCLUDE eg, see https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/main.yml 
+
+  handlers:
+    - name: restart ntpd
+      service: name=ntpd state=restarted
+    # service should be in handler, then even if don't exist, no complain
+    # well, nothing will call this block, so maybe why no complains
+    - name: stop httpd 
+      service:
+        name:  http
+        state: stopped
+...

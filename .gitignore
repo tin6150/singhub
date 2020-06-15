@@ -2,3 +2,4 @@
 *.retry 
 Vagrantfile.byInit
 .vagrant
+ZINK_vm.rst

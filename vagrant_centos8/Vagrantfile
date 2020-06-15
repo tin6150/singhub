@@ -205,7 +205,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   yum -y install epel-release
   yum -y install ansible
   #yum -y install python2  # rhel8 call this python2, and neeeded by ansible
-  ln -s /usr/bin/python3 /usr/bin/python # ansible call unversioned of python, which isn't avail in rhel8 :/
+  #ln -s /usr/bin/python3 /usr/bin/python # ansible call unversioned of python, which isn't avail in rhel8 :/
+  alternatives --set python /usr/bin/python3
+  yum -y install redfish-finder # mostly as test in new dir structure
   #yum -y group install "Server with GUI"
   #yum -y group install "KDE"
 
