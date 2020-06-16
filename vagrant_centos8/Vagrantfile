@@ -234,9 +234,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   ### my favorite config and stuff
   cd $HOME # this end up in /root :-/
-  # ansible somehow also end up expecting /home/tin/.ansible 
-  # so creating that dir manually
-  mkdir -p /home/tin
+  ## from psg/script/sh/bootstrap.sh , but should be done via ansible so multiple provision does not create problem
+  echo "my very ownn stuff, ie add user, sudo, etc"
+	sudo groupadd -g 43143 tin
+	sudo useradd  -g tin -u 43143 -c "tin@lbl.gov" -m -d /home/tin -s /bin/bash tin 
+	sudo pwconv
+  sudo cat /etc/sudoers.d/vagrant | sed  's/^%vagrant/tin/' | sudo tee /etc/sudoers.d/tin
+  ## TBD: what shadow is set for root and vagrant??
+
   cd       /home/tin
   # FIXME below, may accidentally overwrite .bashrc in future...
   wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc 
@@ -246,6 +251,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     git clone https://tin6150@github.com/tin6150/psg
     git clone https://tin6150@github.com/tin6150/singhub
   fi
+  chown -R tin:tin /home/tin
   echo "TRACE L240: End of vagrant provision via shell block"
   SHELL
 
@@ -257,7 +263,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # https://www.vagrantup.com/docs/provisioning/basic_usage.html#multiple-provisioners
   # shell script section above ran, then ansible section below get executed
   config.vm.provision "ansible" do |ansible|
-      ansible.verbose = "vvv"
+      ansible.verbose = "vv"
       #ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=auto " # does NOT mytigate no /usr/bin/python in rhel8
       #ansible.become = "true"
       #ansible.become_user = "root"

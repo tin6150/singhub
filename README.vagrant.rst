@@ -31,6 +31,7 @@ CentOS 8 ::
 	# the 2nd provision section in the Vagrantfile calls ansible
 	# thus need to link the ansible playbook and the role that provision VBox toolbox
 	# the ansible play isnt well developed for rhel8 at this point
+	# centos7 no longer executing the virtualbox-guest role correctly, complain about stat, is it loosing vars?
 	ln -s ../ansible/vagrantfile_playbook.yml .
 	ln -s ../ansible/role/virtualbox-guest    .
 	vagrant provision

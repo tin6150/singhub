@@ -37,13 +37,20 @@
 
 # ansible localhost -m setup # get list of vars/facts
 
+# ++TODO++
+# this playbook is really old, monolything, and bring the worse out of yaml
+# should break it up, but may as well use the wsl_localhost playbook... just that is a thick setup
+# and trying to do lightweight VM for now.
+
+
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
 - hosts: all
   become: true  # sudo, default to root
   roles:
     #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest, no support for centos8/dnf yet as of 2020.0614
     - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 6  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+      # borked, not sure cuz moved to a diff dir? not bothering to fix it now.  but was supposed to work for RHEL 6 & 7.
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
       # cp whole dir to here to adapt code to work in centos
@@ -86,17 +93,27 @@
     - block: 
       - name: dummy rhel only task 
         shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-      - name: "rhel 8 packages install via dnf (so it add dependencies)"
-        dnf: 
+      - name: "rhel 7-8 packages install"
+        package: 
           name:  
             - bc
-            - cvs
-            #- containers-common
-            #- python3-setools
-            #- container-selinux
+            - containers-common
+            - container-selinux
+            - podman        
+            - podman-docker 
+          state: installed
+        when: ansible_distribution_major_version|int <= 7  # nice to have elsif
+      - name: "rhel 8 packages install (AppImage wont install via package or dnf ansible module :/ )"
+        package: 
+          name:  
+            # podman and deps wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
+            - containers-common
+            - container-selinux
+            - python3-setools   # rhel8 only
             #- podman        # this wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
-            #- podman-docker # this wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
+            #- podman-docker 
             # but complain actually is Cannot download Packages/podman-1.6.4-4.module_el8.1.0+298+41f9343a.x86_64.rpm, can't find mirrors or some such
+            # prob cuz AppImage does not provide rpm so it dont work
           state: installed
         when: ansible_distribution_major_version|int >= 8  # essentially nested if
       when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  

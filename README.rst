@@ -10,6 +10,9 @@ This repo used a mix pot of things.
 overall, see README.vagrant.rst and https://tin6150.github.io/psg/vagrant.html
 
 The ansible/ dir contains plays/roles needed to provision Vagrant instances.
+Consider moving all the vagrant stuff together with ansible ans use the newer playbooks.
+Maybe cueball/ANSIBLE as that's the most used.  alt the inet-dev-class/ansible one.
+Then again, ansible could be run from inside the VM and don't need vagrant to execute the provision...
 
 
 
