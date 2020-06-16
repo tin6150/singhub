@@ -59,7 +59,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.vm.synced_folder "../data", "/vagrant_data"
   #config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
+  # seems to be missing kernel module, vbox tool or some such?  can't exec:
+  # mount -t vboxsf -o uid=1000,gid=1000 VAGRANT_DATA /VAGRANT_DATA
 
+
+  config.disksize.size = "50GB"
+	# https://www.vagrantup.com/docs/disks/usage.html
+	# try to add more disk space (expand existing, don't work)
+  # even after export VAGRANT_EXPERIMENTAL="disks"
+  #config.vm.disk :disk, size: "30GB", primary: true
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -76,19 +84,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Use VBoxManage to customize the VM. For example to change memory:
       # vb.customize ["modifyvm", :id, "--memory", "1024"]
   end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
-
-  ## config added by Tin 2017.0917
+  ## vagrant provision run this section ##
   config.vm.provision "shell", inline: <<-SHELL
   touch   /Vagrant_provision
   date >> /Vagrant_provision

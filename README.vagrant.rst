@@ -22,7 +22,7 @@ Creeat a directory for each vagrant instance/vm,
 so that each has its Vagrantfile and .vagrant dir hosting the config.
 
 
-CentOS 8 ::
+CentOS 8 (podman) ::
 
 	mkdir vagrant_centos8
 	# cp -p Vagrantfile.centos8 Vagrantfile
@@ -36,9 +36,7 @@ CentOS 8 ::
 	ln -s ../ansible/role/virtualbox-guest    .
 	vagrant provision
 	vagrant ssh
-	#
-	# this one got podman installed
-	# but podman pull docker.io/tin6150/pyvim still want login.  wtf?
+
 
 CentOS 8 w/ Docker ::
 
@@ -49,8 +47,12 @@ CentOS 8 w/ Docker ::
 	vagrant ssh
 	# full docker-ce, not the rootless thing.  
 	# see Vagrantfile shell provision section for commands
-	# want to see if need to do docker login before can pull...  no login needed for public image, tin6150/pyvim doesnt exist!  it was only in singularity-hub :-D
 
+	# adding space by Vagrantfile: vb.vm.disk :disk, size: "30GB", primary: true
+	vagrant plugin install vagrant-disksize
+	# xx VAGRANT_EXPERIMENTAL="disks"
+	vagrant reload
+	# config.disksize.size = "50GB" worked, but extended sda, need to resize partition before  xfs_growfs /
 
 FreeBSD 11 ::
 
