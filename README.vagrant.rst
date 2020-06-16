@@ -36,6 +36,20 @@ CentOS 8 ::
 	ln -s ../ansible/role/virtualbox-guest    .
 	vagrant provision
 	vagrant ssh
+	#
+	# this one got podman installed
+	# but podman pull docker.io/tin6150/pyvim still want login.  wtf?
+
+CentOS 8 w/ Docker ::
+
+	mkdir vagrant_centos8_docker
+	mkdir vagrant_centos8_docker/VAGRANT_DATA # shared dir b/w VM and host
+	# simplified and updated Vagrantfile
+	vagrant up
+	vagrant ssh
+	# full docker-ce, not the rootless thing.  
+	# see Vagrantfile shell provision section for commands
+	# want to see if need to do docker login before can pull...  no login needed for public image, tin6150/pyvim doesnt exist!  it was only in singularity-hub :-D
 
 
 FreeBSD 11 ::

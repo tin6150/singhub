@@ -1,0 +1,155 @@
+# vim: filetype=ruby shiftwidth=2 tabstop=2 noexpandtab nosmarttab noautoindent nosmartindent paste 
+#
+# note that filetype=... set shiftwidth, settings are parsed left to right, last one stays.
+# so if have things like shiftwidth=8 tabstop=8 filetype=ruby
+# the filetype setting will reset tabstop back to 2 spaces
+
+# XXvim: set syntax syntax on  nonum paste
+# XXvi: set ft=ruby : paste tabstop=4
+
+	# <-- tab here
+#2345678
+
+# tin 2020.0615 simplified, no ansible
+
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  #config.vm.box = "base"
+  # https://app.vagrantup.com/centos/boxes/7
+  #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
+  #config.vm.box = "cent7"	#  need to use old name on c7_casa
+
+
+  # need to find way to fix VirtualBox image name/path, this one seems to be
+  # /home/tin/VirtualBox VMs/vagrant_centos7_default_1592008049000_63100
+  config.vm.box = "viagra8dog"	
+  config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.1.1911-20200113.3.x86_64.vagrant-virtualbox.box' # 2020.0113
+  #config.vm.box_version = "1708.01"
+  config.vm.hostname = "viagra8dog"
+  #
+  #
+  # Create a forwarded port mapping which allows access to a specific port
+  config.vm.network :forwarded_port, guest: 5901, host: 5918	# vncserver :1 # hopefully cli works
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network :private_network, ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network :public_network
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  # config.ssh.forward_agent = true
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+  #config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
+
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  config.vm.provider "virtualbox" do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      vb.gui = true
+      #vb.gui = false # ie headless mode, but may not want to boot headlessly...
+   
+      # Customize the amount of memory on the VM:
+      # default seems to be 512
+      #vb.memory = "1024"
+      vb.memory = "2330"
+      # Use VBoxManage to customize the VM. For example to change memory:
+      # vb.customize ["modifyvm", :id, "--memory", "1024"]
+  end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
+
+  ## config added by Tin 2017.0917
+  config.vm.provision "shell", inline: <<-SHELL
+  touch   /Vagrant_provision
+  date >> /Vagrant_provision
+  echo "rhel8 yum redirect to dnf"
+  yum -y install vim wget curl git autoconf automake libtool 
+  # yum -y install tigervnc-server 
+  yum -y install virt-what
+  yum -y install epel-release
+  yum -y install ansible
+  #yum -y install python2  # rhel8 call this python2, and neeeded by ansible
+  #ln -s /usr/bin/python3 /usr/bin/python # ansible call unversioned of python, which isn't avail in rhel8 :/
+  alternatives --set python /usr/bin/python3
+  #yum -y install redfish-finder # mostly as test in new dir structure
+  #yum -y group install "Server with GUI"
+  #yum -y group install "KDE"
+  # just use vncserver -geometry 1280x800 
+  
+  ### my favorite config and stuff
+  cd $HOME # this end up in /root :-/
+  ## from psg/script/sh/bootstrap.sh , but should be done via ansible so multiple provision does not create problem
+  echo "my very ownn stuff, ie add user, sudo, etc"
+	sudo groupadd -g 43143 tin
+	sudo useradd  -g tin -u 43143 -c "tin@lbl.gov" -m -d /home/tin -s /bin/bash tin 
+	sudo pwconv
+  sudo cat /etc/sudoers.d/vagrant | sed  's/^%vagrant/tin/' | sudo tee /etc/sudoers.d/tin
+  ## TBD: what shadow is set for root and vagrant??
+
+  cd       /home/tin
+  # FIXME below, may accidentally overwrite .bashrc in future...
+  wget https://raw.githubusercontent.com/tin6150/psg/master/script/sh/.bashrc -O .bashrc 
+  if [[ ! -d tin-gh ]] ; then
+    mkdir tin-gh 
+    cd    tin-gh
+    git clone https://tin6150@github.com/tin6150/psg
+    git clone https://tin6150@github.com/tin6150/singhub
+  fi
+  chown -R tin:tin /home/tin
+
+  # install docker-ce -- https://www.linuxtechi.com/install-docker-ce-centos-8-rhel-8/
+  dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+  dnf install docker-ce --nobest -y
+  systemctl start docker
+  systemctl enable docker
+  # docker compose
+  curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+
+  date
+  echo "TRACE L145: Vagrant shell provision os update next"
+  #yum -y --quiet update
+  yum -y  update
+  date
+  echo "TRACE L240: End of vagrant provision via shell block"
+  SHELL
+
+  # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
+  # can i have both shell provision and ansible??  Yes
+  # multiple provisioning expected to run in sequence
+  # https://www.vagrantup.com/docs/provisioning/basic_usage.html#multiple-provisioners
+  # shell script section above ran, then ansible section below get executed
+  # but decided not to run ansible via vagrant provision
+  
+
+end
