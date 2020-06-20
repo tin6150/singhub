@@ -2,9 +2,18 @@
 # vim: filetype=yaml shiftwidth=2 tabstop=2 list expandtab nosmarttab noautoindent nosmartindent
 # paste mode will disable expandtab :-/
 # and yaml will barf when line start with a tab
+#
+# vi use (somehow dont always work in modeline, even when all these are args for :set :-/
+# : set filetype=yaml shiftwidth=2 tabstop=2 expandtab list nu 
+# these may need to be invoked manually:
+# : retab 
+# : syntax on 
+
 
 #
-# example ansible playbook file that expect vagrant provision to run
+# This ansible playbook get executed by Vagran provision 
+# (after the shell block, multiple provision blocks are executed sequentially)
+# Additional ref:
 # http://people.redhat.com/mskinner/rhug/q2.2017/Ansible-Hands-on-Introduction.pdf p23
 # https://www.vagrantup.com/docs/provisioning/ansible_intro.html
 #
@@ -16,31 +25,23 @@
 #    Not sure when need to use "-" and when don't.  Best to use 4 space tab even for "-" and the next/prev block
 #    especially when the "when" clause is at the end of the block!!
 
-# 
-# vi use (somehow dont always work in modeline, even when all these are args for :set :-/
-# : set filetype=yaml shiftwidth=2 tabstop=2 expandtab list nu 
-# these may need to be invoked manually:
-# : retab 
-# : syntax on 
-
-
 ## Ansible Wisdom (for now)
 ## - the way how OS platform/version is handled, the syntax needed to detect them
 ##   and the number of things that are still platform specific 
 ##    + yum vs apt vs dnf, 
-##    + EPEL vs ??, 
+##    + EPEL, AppImage??
 ##    + yum specific argument that is not supported in package module
 ##    + package name is that specific to platform (eg kernel-header vs linux-header)
 ##   it is art to separate out OS specific stuff at the right time on in the hierarchy.
 ##   Cuz, the anoying thing is that the important code of logic flow may need to be split into two files or two blocks :(
 ##   On the flip side, the "when: ansible_os_family == 'Debian' is tested at the bottom, easy to miss!!
 
-# ansible localhost -m setup # get list of vars/facts
+## ansible localhost -m setup # get list of vars/facts
 
-# ++TODO++
-# this playbook is really old, monolything, and bring the worse out of yaml
-# should break it up, but may as well use the wsl_localhost playbook... just that is a thick setup
-# and trying to do lightweight VM for now.
+#### This playbook is really old, monolything, and bring the worse out of yaml
+#### but if split into multiple files, vagrant provision need to link many of them
+#### For now, maintain as something light to apply to all VM
+#### anything heavier should run the wsl_localhost playboook inside the host
 
 
 #- hosts: ansible_os_family == "RedHat" # this don't work.  
@@ -48,8 +49,8 @@
   become: true  # sudo, default to root
   roles:
     #- role: PeterMosmans.virtualbox-guest # adapted from PeterMosmans.virtualbox-guest, no support for centos8/dnf yet as of 2020.0614
-    - role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
-      when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 6  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
+    #- role: virtualbox-guest # adapted from PeterMosmans.virtualbox-guest
+    #  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 6  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
       # borked, not sure cuz moved to a diff dir? not bothering to fix it now.  but was supposed to work for RHEL 6 & 7.
       # previously ran ansible-galaxy install PeterMosmans.virtualbox-guest to get a role in ~/.ansible/roles
       # https://galaxy.ansible.com/PeterMosmans/virtualbox-guest/
@@ -58,42 +59,74 @@
   tasks:
     # next block is platform neutral
     - block:
-      - name: ensure chrony is at the latest version for centos8 via dnf
+      - name: "Redhat or Debian package install"  # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when there are lots of name clause.
+        package: 
+          name: 
+            - zsh 
+            - htop 
+            - spectre-meltdown-checker 
+            - xterm 
+          state: latest
+
+      # lxde is not in epel either.  maybe use xfce, which use GDM.  MATE use LightDM and don't want to mess with that.
+      # https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/RedHat.yml
+      #- name: latest lxde is absent #removed #present
+      #  package: 
+      #    name: lxde 
+      #    state: absent #removed #absent #latest
+
+    # block END
+
+    # next block for RedHat only
+    - block: # rhel only
+      - name: dummy rhel only task 
+        shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+      - name: "rhel 7 and 8 packages install (may not work for 6, but not bothering with that with Vagrant in 2020"
+        tags: [ common ]
         package: 
           name:  
-            - chrony 
-            #- podman-docker 
-          state: latest
-        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 8  # no else either ansible :/
-      - name: ensure ntpd is at the latest version
+            - tcsh
+          state: installed
+      # X wm comparison https://en.wikipedia.org/wiki/Comparison_of_X_window_managers
+      # I actually can just use xfce rather than cinnamon.
+      # tags here intended to be used with skip_tags
+      - name: "rhel 7 and 8 packages install -- xfce (gtk based, ~70M RAM)"
+        tags: [ gui, xfce, gtk ]
+        package: 
+          name:  
+            # xfce4 is lightest wm in rhel8, twm no longer avail.  via EPEL.  maybe diff name in rhel7...
+            - xfwm4              # resize win, run as: xfwm & 
+            - xfce4-session      # optional, add launcher in bottom
+            - xfdesktop          # optional, ~14M, add top menu panel, lead to settings app, window focus; gui file mgr
+            - xfce4-terminal
+            - xfce4-screenshooter
+            - xfce4-settings
+            - xfce4-battery-plugin
+            - ristretto            # image viewer
+            #- xfce4-power-manager
+          state: installed
+      - name: "rhel 7 and 8 packages install -- kwin/qt"
+        tags: [ gui, kwin, qt ]
+        package: 
+          name:  
+            # KWin, provide Qt, ~40M RAM, 148 pkgs, 170MB disk, dont seems to satisfy rstudio 
+            - kwin
+          state: installed
+      - name: "rhel 7 and 8 packages install -- fluxbox, 16M RAM, even lighter than xfce, but kinda old"
+        tags: [ gui, fluxbox ]
+        package: 
+          name:  
+            - fluxbox
+          state: installed
+      - name: "ensure ntpd is at the latest version (rhel 7 has ntp and chrony, using ntp)"
         package: 
           name:  ntp 
           state: latest
         notify:
           - restart ntpd
-        when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int <= 7  # what I want is IFF RH then <= 7.  no easy way to do this in ansible :/
-
-      - name: latest zsh is present # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when ther eare lots of name clause.
-        package: 
-          name: 
-            - zsh 
-            - spectre-meltdown-checker 
-          state: latest
-
-        # lxde is not in epel either.  maybe use xfce, which use GDM.  MATE use LightDM and don't want to mess with that.
-        # https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/RedHat.yml
-      - name: latest lxde is absent #removed #present
-        package: 
-          name: lxde 
-          state: absent #removed #absent #latest
-
-    # block END
-
-    # next block for RedHat only
-    - block: 
-      - name: dummy rhel only task 
-        shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-      - name: "rhel 7-8 packages install"
+        # handler at end of yml file, yes, it is far far away 
+        when: ansible_distribution_major_version|int <= 7  # nice to have elsif
+      - name: "rhel <=7 packages install"
         package: 
           name:  
             - bc
@@ -103,7 +136,7 @@
             - podman-docker 
           state: installed
         when: ansible_distribution_major_version|int <= 7  # nice to have elsif
-      - name: "rhel 8 packages install (AppImage wont install via package or dnf ansible module :/ )"
+      - name: "rhel >= 8 packages install (BUT AppImage wont install via package or dnf ansible module :/ )"
         package: 
           name:  
             # podman and deps wont install via ansible, cuz has dep on AppStream? or some subscription manager thing?
@@ -115,9 +148,18 @@
             # but complain actually is Cannot download Packages/podman-1.6.4-4.module_el8.1.0+298+41f9343a.x86_64.rpm, can't find mirrors or some such
             # prob cuz AppImage does not provide rpm so it dont work
           state: installed
-        when: ansible_distribution_major_version|int >= 8  # essentially nested if
+        when: ansible_distribution_major_version|int >= 8  # essentially nested if, but cant do nested block, and no else clause.  effing ansible :/
+      - name: 'rhel8 packages install -- KDE/Qt, needed by rstudio -- dnf group install "KDE Plasma Workspaces"'
+        tags: [ gui, kde, qt ]
+        dnf: 
+          name:  
+            - "@base-x"
+            #- "@KDE Plasma Workspaces" # no clue why this is borked 
+          #skip_broken: yes
+          state: installed
+        when: ansible_distribution_major_version|int >= 8  # essentially nested if, but cant do nested block, and no else clause.  effing ansible :/
       when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  
-
+    # block END rhel only
 
 
     # next block could be platform neutral if figure out the right syntax and/or package name
@@ -135,11 +177,19 @@
     #      - state: present
 
 
-    - block:
-        - name: latest csh is present # trying to exlude this in RedHat.  works.  see result as skip, condition was False.
-          apt: pkg=csh state=latest
+    # next block for Debian only
+    - block: # 
+      - name: dummy shell task 
+        shell: echo dummy entry
+      - name: "Debian package install (known package name not compatibile in rhel"
+        package: 
+          name:  
+            - fish
+            - xfce4
+          state: installed
       when: ansible_os_family == "Debian"  
       # INCLUDE eg, see https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/main.yml 
+    # block END rhel only
 
   handlers:
     - name: restart ntpd

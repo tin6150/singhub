@@ -46,6 +46,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.network :forwarded_port, guest: 5901, host: 5908	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.disksize.size = "50GB" # seems to be thin provisioned
+  # may need to resize partition and grow fs 
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
   #config.vm.define "cen7" do |cen7|
@@ -252,7 +255,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     git clone https://tin6150@github.com/tin6150/singhub
   fi
   chown -R tin:tin /home/tin
+
+  echo "resizing partition, hopefully safe with every reprovision :)"
+  sudo parted /dev/sda resizepart 1 -1 && sudo xfs_growfs /
   echo "TRACE L240: End of vagrant provision via shell block"
+
   SHELL
 
   #
@@ -265,6 +272,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "ansible" do |ansible|
       ansible.verbose = "vv"
       #ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=auto " # does NOT mytigate no /usr/bin/python in rhel8
+      #?? ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=/usr/local/python3 --tags 'kwin'" 
+      # other ansible tags: fluxbox xfce kwin kde .
+      #ansible.tags = "xfce"  # with tags only run tagged tasks
+      #ansible.skip_tags = "gui"
+      ansible.skip_tags = "kwin, fluxbox, xfce, kde"
       #ansible.become = "true"
       #ansible.become_user = "root"
       ansible.playbook = "vagrantfile_playbook.yml"

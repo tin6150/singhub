@@ -63,7 +63,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # mount -t vboxsf -o uid=1000,gid=1000 VAGRANT_DATA /VAGRANT_DATA
 
 
-  config.disksize.size = "50GB"
+  config.disksize.size = "50GB" # seems to be thin provisioned
+  # parted resizepart 1 100% && growfs_xfs / 
+
 	# https://www.vagrantup.com/docs/disks/usage.html
 	# try to add more disk space (expand existing, don't work)
   # even after export VAGRANT_EXPERIMENTAL="disks"
@@ -141,12 +143,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   echo "TRACE L240: End of vagrant provision via shell block"
   SHELL
 
+  # Run Ansible from the Vagrant Host
   # ref: https://www.vagrantup.com/docs/provisioning/ansible.html
   # can i have both shell provision and ansible??  Yes
   # multiple provisioning expected to run in sequence
   # https://www.vagrantup.com/docs/provisioning/basic_usage.html#multiple-provisioners
   # shell script section above ran, then ansible section below get executed
-  # but decided not to run ansible via vagrant provision
-  
+  config.vm.provision "ansible" do |ansible|
+      ansible.verbose = "vv"
+      #ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=auto " # does NOT mytigate no /usr/bin/python in rhel8
+      #?? ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=/usr/local/python3 --tags 'kwin'" 
+      # other ansible tags: fluxbox xfce kwin kde .
+      #ansible.tags = "xfce"  # with tags only run tagged tasks
+      #ansible.skip_tags = "gui"
+      ansible.skip_tags = "kwin, fluxbox, xfce"
+      #ansible.become = "true"
+      #ansible.become_user = "root"
+      ansible.playbook = "vagrantfile_playbook.yml"
+  end
 
+  
 end
