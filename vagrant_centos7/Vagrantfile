@@ -263,8 +263,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # https://www.vagrantup.com/docs/provisioning/basic_usage.html#multiple-provisioners
   # shell script section above ran, then ansible section below get executed
   config.vm.provision "ansible" do |ansible|
-      ansible.verbose = "vvv"
+      ansible.verbose = "vv"
       #ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=auto " # does NOT mytigate no /usr/bin/python in rhel8
+      #?? ansible.playbook_command = "/usr/bin/ansible-playbook -e ansible_python_interpreter=/usr/local/python3 --tags 'kwin'" 
+      # other ansible tags: fluxbox xfce kwin kde .
+      #ansible.tags = "xfce"  # with tags only run tagged tasks
+      #ansible.skip_tags = "gui"
+      ansible.skip_tags = "kwin, fluxbox, xfce, kde"
       #ansible.become = "true"
       #ansible.become_user = "root"
       ansible.playbook = "vagrantfile_playbook.yml"

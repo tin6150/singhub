@@ -57,9 +57,11 @@
       # cp whole dir to here to adapt code to work in centos
       # cp -pr ~/.ansible/roles/PeterMosmans.virtualbox-guest ./virtualbox-guest 
   tasks:
+    ########################################
     # next block is platform neutral
+    ########################################
     - block:
-      - name: "Redhat or Debian package install"  # the alt syntax for yum/apt is closer to package, and platform neutrality is prefered, even when there are lots of name clause.
+      - name: "package install -- platform neutral"  # but package name may differ b/w distros
         package: 
           name: 
             - zsh 
@@ -75,18 +77,24 @@
       #    name: lxde 
       #    state: absent #removed #absent #latest
 
-    # block END
+    ########## block END platform neutral ##########
 
+
+    ########################################
     # next block for RedHat only
+    ########################################
     - block: # rhel only
-      - name: dummy rhel only task 
+
+      - name: "dummy task -- rhel only , but no version restriction"
         shell: echo dummy now https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+
       - name: "rhel 7 and 8 packages install (may not work for 6, but not bothering with that with Vagrant in 2020"
         tags: [ common ]
         package: 
           name:  
             - tcsh
           state: installed
+
       # X wm comparison https://en.wikipedia.org/wiki/Comparison_of_X_window_managers
       # I actually can just use xfce rather than cinnamon.
       # tags here intended to be used with skip_tags
@@ -105,6 +113,7 @@
             - ristretto            # image viewer
             #- xfce4-power-manager
           state: installed
+
       - name: "rhel 7 and 8 packages install -- kwin/qt"
         tags: [ gui, kwin, qt ]
         package: 
@@ -112,12 +121,14 @@
             # KWin, provide Qt, ~40M RAM, 148 pkgs, 170MB disk, dont seems to satisfy rstudio 
             - kwin
           state: installed
+
       - name: "rhel 7 and 8 packages install -- fluxbox, 16M RAM, even lighter than xfce, but kinda old"
         tags: [ gui, fluxbox ]
         package: 
           name:  
             - fluxbox
           state: installed
+
       - name: "ensure ntpd is at the latest version (rhel 7 has ntp and chrony, using ntp)"
         package: 
           name:  ntp 
@@ -126,7 +137,24 @@
           - restart ntpd
         # handler at end of yml file, yes, it is far far away 
         when: ansible_distribution_major_version|int <= 7  # nice to have elsif
-      - name: "rhel <=7 packages install"
+
+      - name: 'rhel packages install -- KDE/Qt'
+        tags: [ gui, kde, qt ]
+        yum: 
+          # this is package name, not ask name.  :/
+          name:  
+            #- "@base-x"
+            #- "@^kde-desktop-environment" # @^ is for environment group. 
+            - "@kde-desktop"               # @  is for (package) group.
+            # but none of these worked for rhel8 , it really doesnt like kde/qt 
+            # even `dnf group install "KDE Plasma Workspaces" ` fails in rhel8 
+            # `yum group list hidden ids` to see environment @^groups vs package @group name.  
+            # https://docs.ansible.com/ansible/latest/modules/yum_module.html
+          #skip_broken: yes
+          state: installed
+        when: ansible_distribution_major_version|int <= 7       
+
+      - name: "rhel <= 7 packages install"
         package: 
           name:  
             - bc
@@ -136,6 +164,7 @@
             - podman-docker 
           state: installed
         when: ansible_distribution_major_version|int <= 7  # nice to have elsif
+
       - name: "rhel >= 8 packages install (BUT AppImage wont install via package or dnf ansible module :/ )"
         package: 
           name:  
@@ -149,35 +178,14 @@
             # prob cuz AppImage does not provide rpm so it dont work
           state: installed
         when: ansible_distribution_major_version|int >= 8  # essentially nested if, but cant do nested block, and no else clause.  effing ansible :/
-      - name: 'rhel8 packages install -- KDE/Qt, needed by rstudio -- dnf group install "KDE Plasma Workspaces"'
-        tags: [ gui, kde, qt ]
-        dnf: 
-          name:  
-            - "@base-x"
-            #- "@KDE Plasma Workspaces" # no clue why this is borked 
-          #skip_broken: yes
-          state: installed
-        when: ansible_distribution_major_version|int >= 8  # essentially nested if, but cant do nested block, and no else clause.  effing ansible :/
-      when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  
-    # block END rhel only
+
+      when: ansible_os_family == "RedHat" # and ansible_distribution_major_version|int <= 7  # when for block clause
+    ########## block END rhel only ##########
 
 
-    # next block could be platform neutral if figure out the right syntax and/or package name
-    # nope, couldn't get the block clause under package to work.  
-    #- block:
-    #  - name: xfce is present
-        #shell: yum --enablerepo=epel -y groupinstall xfce-desktop x11
-        #yum: enablerepo=epel name="@Xfce" state=present
-    # can I do it this way?    could it be platform neutral??
-    #    package: 
-    #      - block:
-    #          enablerepo=epel 
-    #          when ansible_os_family == 'RedHat'
-    #      - name: "@Xfce" 
-    #      - state: present
-
-
+    ########################################
     # next block for Debian only
+    ########################################
     - block: # 
       - name: dummy shell task 
         shell: echo dummy entry
@@ -189,8 +197,12 @@
           state: installed
       when: ansible_os_family == "Debian"  
       # INCLUDE eg, see https://github.com/DevOps4Networks/ansible-linux-desktop-role/blob/master/tasks/main.yml 
-    # block END rhel only
+    ########## block END debian only ##########
 
+
+  ########################################
+  # handler section
+  ########################################
   handlers:
     - name: restart ntpd
       service: name=ntpd state=restarted
@@ -200,4 +212,5 @@
       service:
         name:  http
         state: stopped
+
 ...
