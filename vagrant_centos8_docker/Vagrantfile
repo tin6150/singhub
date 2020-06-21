@@ -58,7 +58,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   #config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
+  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
+  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA", disabled: true
   # seems to be missing kernel module, vbox tool or some such?  can't exec:
   # mount -t vboxsf -o uid=1000,gid=1000 VAGRANT_DATA /VAGRANT_DATA
 
@@ -84,7 +85,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       #vb.memory = "1024"
       vb.memory = "2330"
       # Use VBoxManage to customize the VM. For example to change memory:
-      # vb.customize ["modifyvm", :id, "--memory", "1024"]
+      vb.customize ["modifyvm", :id, "--memory", "4096"]
+      #vb.cpus = "2"
+      vb.customize ["modifyvm", :id, "--cpus", "3"]
   end
 
   ## vagrant provision run this section ##
@@ -93,7 +96,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   date >> /Vagrant_provision
   echo "rhel8 yum redirect to dnf"
   yum -y install vim wget curl git autoconf automake libtool 
-  # yum -y install tigervnc-server 
+  yum -y install tigervnc-server 
   yum -y install virt-what
   yum -y install epel-release
   yum -y install ansible
@@ -156,7 +159,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # other ansible tags: fluxbox xfce kwin kde .
       #ansible.tags = "xfce"  # with tags only run tagged tasks
       #ansible.skip_tags = "gui"
-      ansible.skip_tags = "kwin, fluxbox, xfce"
+      ansible.skip_tags = "fluxbox, xfce, kde" # kwin, kde 
       #ansible.become = "true"
       #ansible.become_user = "root"
       ansible.playbook = "vagrantfile_playbook.yml"

@@ -114,7 +114,7 @@
             #- xfce4-power-manager
           state: installed
 
-      - name: "rhel 7 and 8 packages install -- kwin/qt"
+      - name: "rhel 7 and 8 packages install -- kwin/qt (kwin & to start window manager)"
         tags: [ gui, kwin, qt ]
         package: 
           name:  

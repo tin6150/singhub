@@ -45,7 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.hostname = "vigra6"
   #
   config.vm.network :forwarded_port, guest: 5901, host: 5907	# vncserver :1 # hopefully cli works
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+  #-config.vm.synced_folder ".", "/vagrant", disabled: true
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
   #config.vm.define "cen7" do |cen7|
@@ -181,11 +181,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
-      vb.memory = "2330"
+      ##vb.memory = "2330"
+      vb.memory = "3172"  # this works too, dont have to use the modifyvm version below
+      #+vb.customize ["modifyvm", :id, "--memory", "4096"]
+      vb.cpus = "2"       # this works too, dont have to use the modifyvm version below
+      ##+vb.customize ["modifyvm", :id, "--cpu", "2"]
   end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
@@ -253,6 +254,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   fi
   chown -R tin:tin /home/tin
   echo "TRACE L240: End of vagrant provision via shell block"
+
+  echo 1000 > /proc/sys/user/max_user_namespaces
   SHELL
 
   #
