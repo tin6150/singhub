@@ -1,6 +1,10 @@
 
 
-on Zink, it got kde, xfce installed.  centos 7.8
+centos 7.8
+on Zink, it got kde, xfce installed.   podman
+
+
+~~~~
 
 vnc size/resolution:
 	alias vncsvr16='vncserver -geometry 1540x760 -depth 24'    #  1600x900  m42
@@ -27,6 +31,9 @@ had to
 echo 1000 | sudo tee /proc/sys/user/max_user_namespaces
 to enable userns (this is the config that centos7 have userns included but disabled by default).
 https://superuser.com/questions/1294215/is-it-safe-to-enable-user-namespaces-in-centos-7-4-and-how-to-do-it
+	Need to do this on each boot??!!  use sysctl:
+	https://superuser.com/questions/1294215/is-it-safe-to-enable-user-namespaces-in-centos-7-4-and-how-to-do-it
+
 
 trying:
 podman run  -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix                                   -v $HOME:/tmp/home  --entrypoint rstudio tin6150/r4eta

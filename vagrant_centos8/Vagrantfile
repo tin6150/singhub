@@ -45,10 +45,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.hostname = "vigra6"
   #
   config.vm.network :forwarded_port, guest: 5901, host: 5908	# vncserver :1 # hopefully cli works
+  config.vm.network :forwarded_port, guest: 8888, host: 8899	# vncserver :1 # hopefully cli works
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
-  config.disksize.size = "50GB" # seems to be thin provisioned
-  # may need to resize partition and grow fs 
+  #config.disksize.size = "50GB" # seems to be thin provisioned
+  config.disksize.size = "60GB" # trying to chnge viagra8 to 60 GB, see if it works
+  # provision shell command section runs resizepart and growfs 
+
   #
   # was using this block below, but only work in mac, not in mint, not in backbox :(
   #config.vm.define "cen7" do |cen7|
@@ -178,13 +181,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |vb|
       # Display the VirtualBox GUI when booting the machine
       #vb.gui = true
-      #vb.gui = false # ie headless mode
-      vb.gui = true
+      vb.gui = false # ie headless mode
+      #vb.gui = true
    
       # Customize the amount of memory on the VM:
       # default seems to be 512
       #vb.memory = "1024"
       vb.memory = "2330"
+      # Use VBoxManage to customize the VM. For example to change memory:
+      vb.customize ["modifyvm", :id, "--memory", "8096"]
+      #vb.cpus = "2"
+      vb.customize ["modifyvm", :id, "--cpus", "9"]
+      # expect idle cpu to be available to host, so ok to add more
+      # some docker build take lots of cpu...
+
   end
   #
   # View the documentation for the provider you are using for more
@@ -257,7 +267,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   chown -R tin:tin /home/tin
 
   echo "resizing partition, hopefully safe with every reprovision :)"
-  sudo parted /dev/sda resizepart 1 -1 && sudo xfs_growfs /
+  ##sudo parted /dev/sda resizepart 1 -1 && sudo xfs_growfs /
+  echo "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 1 && sudo xfs_growfs /
+  ## buggy parted see https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203
   echo "TRACE L240: End of vagrant provision via shell block"
 
   SHELL

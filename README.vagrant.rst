@@ -40,6 +40,8 @@ CentOS 8 (podman) ::
 
 CentOS 8 w/ Docker ::
 
+	# PLAN fat image w/ cueball ansible playbook , but problem with tags :/  2020.0715
+
 	mkdir vagrant_centos8_docker
 	mkdir vagrant_centos8_docker/VAGRANT_DATA # shared dir b/w VM and host
 	# simplified and updated Vagrantfile

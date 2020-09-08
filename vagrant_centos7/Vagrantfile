@@ -184,7 +184,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ##vb.memory = "2330"
       vb.memory = "3172"  # this works too, dont have to use the modifyvm version below
       #+vb.customize ["modifyvm", :id, "--memory", "4096"]
-      vb.cpus = "2"       # this works too, dont have to use the modifyvm version below
+      vb.cpus = "7"       # this works too, dont have to use the modifyvm version below
       ##+vb.customize ["modifyvm", :id, "--cpu", "2"]
   end
 
