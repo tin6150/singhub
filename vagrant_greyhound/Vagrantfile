@@ -1,0 +1,133 @@
+# vim: filetype=ruby shiftwidth=2 tabstop=2 noexpandtab nosmarttab noautoindent nosmartindent paste 
+#
+# note that filetype=... set shiftwidth, settings are parsed left to right, last one stays.
+# so if have things like shiftwidth=8 tabstop=8 filetype=ruby
+# the filetype setting will reset tabstop back to 2 spaces
+
+# XXvim: set syntax syntax on  nonum paste
+# XXvi: set ft=ruby : paste tabstop=4
+
+	# <-- tab here
+#2345678
+
+# tin 2020.0615 simplified, no ansible
+
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # All Vagrant configuration is done here. The most common configuration
+  # options are documented and commented below. For a complete reference,
+  # please see the online documentation at vagrantup.com.
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  #config.vm.box = "base"
+  # https://app.vagrantup.com/centos/boxes/7
+  #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
+  #config.vm.box = "cent7"	#  need to use old name on c7_casa
+
+
+  # need to find way to fix VirtualBox image name/path, this one seems to be
+  # /home/tin/VirtualBox VMs/vagrant_centos7_default_1592008049000_63100
+  config.vm.box = "greyhound"	
+  config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.2.2004-20200611.2.x86_64.vagrant-virtualbox.box' # 2020.0903
+  #config.vm.box_version = "1708.01"
+  config.vm.hostname = "greyhound"
+  #
+  #
+  # Create a forwarded port mapping which allows access to a specific port
+  #config.vm.network :forwarded_port, guest: 5901, host: 5918	# vncserver :1 # hopefully cli works
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network :private_network, ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network :public_network
+  config.vm.network :public_network, ip: "128.3.7.87"
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  # config.ssh.forward_agent = true
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+  #config.vm.synced_folder ".", "/vagrant", disabled: true
+  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
+  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA", disabled: true
+  # seems to be missing kernel module, vbox tool or some such?  can't exec:
+  # mount -t vboxsf -o uid=1000,gid=1000 VAGRANT_DATA /VAGRANT_DATA
+
+
+  config.disksize.size = "100GB" # seems to be thin provisioned
+  # parted resizepart 1 100% && growfs_xfs / 
+  # buggy parted see https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203, but below worked on a test system
+  # echo "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 1 && sudo xfs_growfs /
+
+
+	# https://www.vagrantup.com/docs/disks/usage.html
+	# try to add more disk space (expand existing, don't work)
+  # even after export VAGRANT_EXPERIMENTAL="disks"
+  #config.vm.disk :disk, size: "30GB", primary: true
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  config.vm.provider "virtualbox" do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      #vb.gui = true
+      vb.gui = false # ie headless mode, but may not want to boot headlessly...
+   
+      # Customize the amount of memory on the VM:
+      # default seems to be 512
+      #vb.memory = "1024"
+      vb.memory = "8192"
+      # Use VBoxManage to customize the VM. For example to change memory:
+      vb.customize ["modifyvm", :id, "--memory", "16384"]
+      #vb.cpus = "2"
+      vb.customize ["modifyvm", :id, "--cpus", "8"]
+  end
+
+  ## vagrant provision run this section ##
+  config.vm.provision "shell", inline: <<-SHELL
+  # may need to add additional nic cfg here
+  touch   /Vagrant_provision
+  date >> /Vagrant_provision
+  echo "rhel8 yum redirect to dnf"
+  yum -y install vim wget curl git autoconf automake libtool 
+  yum -y install tigervnc-server 
+  yum -y install virt-what
+  yum -y install epel-release
+  yum -y install ansible
+  #yum -y install python2  # rhel8 call this python2, and neeeded by ansible
+  alternatives --set python /usr/bin/python3
+  
+	sudo groupadd -g 43143 tin
+	sudo useradd  -g tin -u 43143 -c "tin@lbl.gov" -m -d /home/tin -s /bin/bash tin 
+	sudo pwconv
+  sudo cat /etc/sudoers.d/vagrant | sed  's/^%vagrant/tin/' | sudo tee /etc/sudoers.d/tin
+
+  # install docker-ce -- https://www.linuxtechi.com/install-docker-ce-centos-8-rhel-8/
+  dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+  dnf install docker-ce --nobest -y
+  systemctl start docker
+  systemctl enable docker
+  # docker compose
+  curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+
+  date
+  echo "TRACE L145: Vagrant shell provision os update next"
+  #yum -y --quiet update
+  yum -y  update
+  date
+  echo "TRACE L240: End of vagrant provision via shell block"
+  SHELL
+
+end
