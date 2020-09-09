@@ -1,26 +1,16 @@
 # vim: filetype=ruby shiftwidth=2 tabstop=2 noexpandtab nosmarttab noautoindent nosmartindent paste 
 #
-# note that filetype=... set shiftwidth, settings are parsed left to right, last one stays.
-# so if have things like shiftwidth=8 tabstop=8 filetype=ruby
-# the filetype setting will reset tabstop back to 2 spaces
-
-# XXvim: set syntax syntax on  nonum paste
-# XXvi: set ft=ruby : paste tabstop=4
-
-	# <-- tab here
-#2345678
-
 # tin 2020.0615 simplified, no ansible
-## had to provide input on which iterface to bind (eno2)
 
 # run as:
 # sudo vagrant up # in the same directory where the Vagrantfile is located.
 # it is important to run as root so that VM image is stored in /root/VirtualBox\ VMs
+# well, actually cuz of space, root's vbox config redirect file store to /clusterfs/gretadev/data/VBoxVM
 
 # enable disk resize feature
 # https://www.vagrantup.com/docs/disks/usage
 # but may not be needed by the vboxmanage modifyhd clause
-VAGRANT_EXPERIMENTAL = "disks"
+VAGRANT_EXPERIMENTAL="disks"
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
@@ -31,66 +21,11 @@ unless Vagrant.has_plugin?("vagrant-disksize")
     raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
 end
 
-# https://crysol.org/recipe/2015-11-17/vagrant-vdi-virtual-disk-for-virtualbox.html#.X1fWn8jYqUk
-# following above to create a vdi first, so that it can be resized
-# stupid vagrant somehow stubornly create vmdk and provide no way to expand it :-\
-
-##ROOT_DISK = "/clusterfs/gretadev/data/VBoxVM/greyhound.vdi"
-ROOT_DISK = "disk/greyhound.vdi"
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  #config.vm.box = "base"
   config.vm.box = "greyhound"	
   config.vm.box_url = 'http://cloud.centos.org/centos/8/vagrant/x86_64/images/CentOS-8-Vagrant-8.2.2004-20200611.2.x86_64.vagrant-virtualbox.box' # 2020.0903
   config.vm.hostname = "greyhound"
-
-  # https://stackoverflow.com/questions/14917353/resizing-disk-space-on-vagrant-box
-  config.vm.define :myvm do |myvm|
-    myvm.vm.network "public_network",  bridge:"eno2",      ip:"128.3.32.87",   netmask:"255.255.252.0"   # vbox eth1?
-    myvm.vm.network "public_network",  bridge:"enp94s0f0", ip:"172.22.44.155", netmask:"255.255.255.0" # vbox eth2?
-    #
-    # https://www.vagrantup.com/docs/providers/virtualbox/configuration
-    # Provider-specific configuration 
-    myvm.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--name", "greyhound"]
-      if ! File.exist?("greyhound.vdi")
-        vb.customize ['createhd',
-                      '--filename', 'disk/greyhound.vid',
-                      '--format',   'VDI', 
-                      '--size',     128000 ]
-        vb.customize ['storageattach', :id,
-                      '--storagectl', 'SATA Controller', 
-                      '--port', 0,
-                      '--device',   0,
-                      '--type',   'hdd',
-                      '--medium',  'disk/greyhound.vid' ]
-      end # if-argv-0
-                      
-      # Display the VirtualBox GUI when booting the machine
-      #vb.gui = true
-      vb.gui = false # ie headless mode, but may not want to boot headlessly...
-   
-      # Customize the amount of memory on the VM:
-      # default seems to be 512
-      #vb.memory = "1024"
-      vb.memory = "8192"
-      # Use VBoxManage to customize the VM. For example to change memory:
-      vb.customize ["modifyvm", :id, "--memory", "16384"]
-      #vb.cpus = "2"
-      vb.customize ["modifyvm", :id, "--cpus", "6"]
-      #resize disk, unit in GB
-      #dont readily work cuz vbox won't take uuid provided by :id, need some full path, so this need dynamically configured :-\
-      ##vb.customize ["modifyhd", :id, "--resize", "45"]
-      vb.customize ["modifyvm", :id, "--resize", "45"]
-    end # provider-vbox
-  end # myvm
-
-  # Every Vagrant virtual environment requires a box to build off of.
-  #config.vm.box = "base"
-  # https://app.vagrantup.com/centos/boxes/7
-  #config.vm.box = "foo7"	# mint ran: vagrant box add foo7 https://vagrantcloud.com/centos/boxes/7/versions/1708.01/providers/virtualbox.box 
-  #config.vm.box = "cent7"	#  need to use old name on c7_casa
-
-
   #
   #
   # Create a forwarded port mapping which allows access to a specific port
@@ -105,8 +40,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # your network.
   # config.vm.network :public_network
   #config.vm.network "private_network", ip: "10.22.22.5" # dummy placeholder for vbox eth0 (nat)
-  #//config.vm.network "public_network",  bridge:"eno2",      ip:"128.3.32.87",   netmask:"255.255.252.0"   # vbox eth1?
-  #//config.vm.network "public_network",  bridge:"enp94s0f0", ip:"172.22.44.155", netmask:"255.255.255.0" # vbox eth2?
+  config.vm.network "public_network",  bridge:"eno2",      ip:"128.3.32.87",   netmask:"255.255.252.0" # vbox eth1
+  config.vm.network "public_network",  bridge:"enp94s0f0", ip:"172.22.44.155", netmask:"255.255.255.0" # vbox eth2
   # vagrant does not allow creating bridge for 10.22.22.x, vbox host-only net conflict, 
   # so will have to fiddle that subsequently with vbox cmd...
   # private_network is 'host-only'.  stupid vagrant nomenclature.
@@ -118,31 +53,33 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #  run: "always",
   #  inline: "ifconfig eth1 128.3.32.87 netmask 255.255.0.0 up"
 
-
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
   # config.ssh.forward_agent = true
 
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-  #config.vm.synced_folder ".", "/vagrant", disabled: true
-  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA"
-  ##config.vm.synced_folder "./VAGRANT_DATA", "/VAGRANT_DATA", disabled: true
-  # seems to be missing kernel module, vbox tool or some such?  can't exec:
-  # mount -t vboxsf -o uid=1000,gid=1000 VAGRANT_DATA /VAGRANT_DATA
+  ## below worked for zink vbox 5.2.42_Ubuntur137960 Vagrant 2.0.2, and it is the magic to make vbox create vdi file :-\
+  # need to halt and up to get new size
+  # and to run parted and growfs as provision cmd inside the os
+  config.disksize.size = "110GB" 
 
-
-  #config.disksize.size = "100GB" # seems to be thin provisioned
-  # path is NOT heeded below
-  #~~config.vm.disk :disk, name: "root", size: "29GB", disk_ext: "vdi", primary: true # path: "/clusterfs/gretadev/data/VBoxVM/greyhound"
-  ##config.vm.disk :disk, size: "29GB", primary: true # path: "/clusterfs/gretadev/data/VBoxVM/greyhound"
-
-  # parted resizepart 1 100% && growfs_xfs / 
-  # buggy parted see https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203, but below worked on a test system
-  # echo "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 1 && sudo xfs_growfs /
+  # https://www.vagrantup.com/docs/providers/virtualbox/configuration
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  config.vm.provider "virtualbox" do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      #vb.gui = true
+      vb.gui = false # ie headless mode, but may not want to boot headlessly...
+   
+      # Customize the amount of memory on the VM:
+      # default seems to be 512
+      #vb.memory = "1024"
+      vb.memory = "8192"
+      # Use VBoxManage to customize the VM. For example to change memory:
+      vb.customize ["modifyvm", :id, "--memory", "16384"]
+      #vb.cpus = "2"
+      vb.customize ["modifyvm", :id, "--cpus", "7"]
+  end
 
   ## vagrant provision run this section ##
   config.vm.provision "shell", inline: <<-SHELL
@@ -153,21 +90,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   date >> /Vagrant_provision
   echo "rhel8 yum redirect to dnf"
   yum -y install vim wget curl git autoconf automake libtool 
-  yum -y install tigervnc-server 
-  yum -y install virt-what
-  yum -y install net-tools # netstat for rhel8
-  yum -y install traceroute telnet nmap-ncat # nmap-ncat provides nc
+  yum -y install virt-what net-tools traceroute telnet nmap-ncat # nmap-ncat provides nc # net-tools provide route cmd
   yum -y install epel-release
   yum -y install ansible
 
   #yum -y install python2  # rhel8 call this python2, and neeeded by ansible
   alternatives --set python /usr/bin/python3
-  
-  #sudo groupadd -g 43143 tin
-  #sudo useradd  -g tin -u 43143 -c "tin@lbl.gov" -m -d /home/tin -s /bin/bash tin 
-  #sudo pwconv
-  #sudo cat /etc/sudoers.d/vagrant | sed  's/^%vagrant/tin/' | sudo tee /etc/sudoers.d/tin
 
+  ## resize
+  echo "resizing partition, hopefully safe with every reprovision :)"
+  ##sudo parted /dev/sda resizepart 1 -1 && sudo xfs_growfs /
+  echo "yes\n100%" | sudo parted /dev/sda ---pretend-input-tty unit % resizepart 1 && sudo xfs_growfs /
+  ## buggy parted see https://bugs.launchpad.net/ubuntu/+source/parted/+bug/1270203
+  
   # install docker-ce -- https://www.linuxtechi.com/install-docker-ce-centos-8-rhel-8/
   ##yum -y install containers-common containernetworking-plugins container-selinux ## no explicit need
   dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
@@ -179,7 +114,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   chmod +x /usr/local/bin/docker-compose
 
   date
-  echo "TRACE L145: Vagrant shell provision os update next"
+  echo "TRACE L145: Vagrant shell provision os update next--maybe skipped"
   #yum -y --quiet update
   #yum -y  update
   #yum -y  update --excluce="docker*"
@@ -191,11 +126,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell",
     run: "always",
     inline: "eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`"
+    # route del default gw 10.0.2.2
+
+  # reconfigure eth2 to have desired IP for eth2, since Vagrant refused to build machine with that IP range  ## ++FIXME to use 10.22.22.4
+  config.vm.provision "shell",
+    run: "always",
+    inline: "ifconfig eth2 10.22.22.44 netmask 255.255.0 up"
+  config.vm.provision "shell",
+    run: "always",
+    inline: "/sbin/ip route add 10.22.22.0/24  dev eth2"
 
   # default router ## this fail if already done and rest of Vagrant not run... so put at the end.
   config.vm.provision "shell",
     run: "always",
     inline: "route add default gw 128.3.34.146"
-
+    # do NOT add "GATEWAY=128.3.34.146" to ifcfg-eth1, instead, use systemd_net_fix.services to create route.  relying on vagrant up --provision is also unreliable
 
 end
